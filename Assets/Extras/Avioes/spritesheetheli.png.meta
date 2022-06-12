@@ -1,0 +1,331 @@
+fileFormatVersion: 2
+guid: 0d7ffffa250034b4d992d6eba8028ce6
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 343815352339812079
+    second: spritesheetheli_0
+  - first:
+      213: 2491507825060125184
+    second: spritesheetheli_1
+  - first:
+      213: 4385197669720084266
+    second: spritesheetheli_2
+  - first:
+      213: -7645292413001319967
+    second: spritesheetheli_3
+  - first:
+      213: 4432682915794893306
+    second: spritesheetheli_4
+  - first:
+      213: 1336971779975443886
+    second: spritesheetheli_5
+  - first:
+      213: -3136007798902924180
+    second: spritesheetheli_6
+  - first:
+      213: -8083945482183349004
+    second: spritesheetheli_7
+  - first:
+      213: -438027709382196095
+    second: spritesheetheli_8
+  - first:
+      213: 3768076426166213312
+    second: spritesheetheli_9
+  - first:
+      213: 1942946819067367334
+    second: spritesheetheli_10
+  - first:
+      213: 7726872524637591690
+    second: spritesheetheli_11
+  - first:
+      213: -4684558309407326856
+    second: spritesheetheli_12
+  - first:
+      213: 22978734865109698
+    second: spritesheetheli_13
+  - first:
+      213: 4442653175894056806
+    second: spritesheetheli_14
+  - first:
+      213: -2105499582815778081
+    second: spritesheetheli_15
+  - first:
+      213: 2558564002069994395
+    second: spritesheetheli_16
+  - first:
+      213: -8783554971520379406
+    second: spritesheetheli_17
+  - first:
+      213: 9132180277390821147
+    second: spritesheetheli_18
+  - first:
+      213: 2089931931004369122
+    second: spritesheetheli_19
+  - first:
+      213: -2303875313905298018
+    second: spritesheetheli_20
+  - first:
+      213: -5987929496853209554
+    second: spritesheetheli_21
+  - first:
+      213: 2747874571874916709
+    second: spritesheetheli_22
+  - first:
+      213: -3186522426531336715
+    second: spritesheetheli_23
+  - first:
+      213: 7002890856735710182
+    second: spritesheetheli_24
+  - first:
+      213: 8000193299239543977
+    second: spritesheetheli_25
+  - first:
+      213: 5950524627761855865
+    second: spritesheetheli_26
+  - first:
+      213: 5477190782241608187
+    second: spritesheetheli_27
+  - first:
+      213: -4483175542534005296
+    second: spritesheetheli_28
+  - first:
+      213: -8350160108312679951
+    second: spritesheetheli_29
+  - first:
+      213: -4313133216447917569
+    second: spritesheetheli_30
+  - first:
+      213: -2643592094208009972
+    second: spritesheetheli_31
+  - first:
+      213: 7274844369600178132
+    second: spritesheetheli_32
+  - first:
+      213: -6279247201282509198
+    second: spritesheetheli_33
+  - first:
+      213: 4656291161662150675
+    second: spritesheetheli_34
+  - first:
+      213: -3359877507767042790
+    second: spritesheetheli_35
+  - first:
+      213: -8603558333551879601
+    second: spritesheetheli_36
+  - first:
+      213: -1229709705855132492
+    second: spritesheetheli_37
+  - first:
+      213: -6626576364050685526
+    second: spritesheetheli_38
+  - first:
+      213: 4962037799624037710
+    second: spritesheetheli_39
+  - first:
+      213: 2843164812201080655
+    second: spritesheetheli_40
+  - first:
+      213: -8821348596017490546
+    second: spritesheetheli_41
+  - first:
+      213: -3059888327710461661
+    second: spritesheetheli_42
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: spritesheetheli_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 393
+        width: 416
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fee4a88cd3a75c400800000000000000
+      internalID: 343815352339812079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spritesheetheli_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 262
+        width: 416
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00a90d39a2d939220800000000000000
+      internalID: 2491507825060125184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spritesheetheli_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 131
+        width: 416
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a2f498dfb0a5bdc30800000000000000
+      internalID: 4385197669720084266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: spritesheetheli_3
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 416
+        height: 131
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e9311f8e0776e590800000000000000
+      internalID: -7645292413001319967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
