@@ -68,6 +68,7 @@ public class bird : MonoBehaviour
             rb2d.gravityScale = 0;
             rb2d.velocity = Vector2.zero;
             Aura.SetActive(true);
+
         }else if (!GameControl.instance.isDash)
         {
             Aura.SetActive(false);
@@ -106,14 +107,12 @@ public class bird : MonoBehaviour
 
         if (isDead == false)
         {
-            if (GameControl.instance.isDash == false)
+            if (!GameControl.instance.isDash)
             {
                 rb2d.gravityScale = 0;
                 rb2d.velocity = Vector2.zero;
                 FindObjectOfType<AudioManager>().Play("Morte");
                 anim.SetTrigger("Die");
-                ParticleSystem particles = GetComponentInChildren<ParticleSystem>();
-                particles.Stop();
                 rb2d.velocity = Vector2.zero;
                 StartCoroutine(cameraShake.Shake(.2f, .2f));
                 FindObjectOfType<AudioManager>().Stop("Musica");
@@ -122,7 +121,7 @@ public class bird : MonoBehaviour
                 Wind.SetActive(false);
                 GameControl.instance.BirdDied();
                 
-            }
+            }   
             else
             {
 

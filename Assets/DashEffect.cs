@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DashEffect : MonoBehaviour, IPooledObject
 {
+    public float velocity;
     public void Start()
     {
         GetComponent<Rigidbody2D>().velocity = new Vector2(-5, 0);
@@ -26,9 +27,24 @@ public class DashEffect : MonoBehaviour, IPooledObject
 
     void Update()
     {
+
+        UpdateSpeed();
+    }
+
+    private void UpdateSpeed()
+    {
         if (GameControl.instance.gameOver == true)
         {
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        }
+        else
+        {
+            velocity = GameControl.instance.scrollSpeed;
+            GetComponent<Rigidbody2D>().velocity = new Vector2(velocity, 0);
+            if (transform.position.x < -16)
+            {
+                gameObject.SetActive(false);
+            }
         }
     }
 

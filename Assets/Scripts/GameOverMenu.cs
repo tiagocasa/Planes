@@ -10,7 +10,6 @@ public class GameOverMenu : MonoBehaviour
     public bool enablecont;
     public Button yourbutton;
     public Animator continueanim;
-    public AdManager Adman;
    
     void Awake()
     {
@@ -27,8 +26,6 @@ public class GameOverMenu : MonoBehaviour
 
     public void Continue()
     {
-        Adman.PlayInterAD();
-
         //if (PlayerPrefs.GetInt("Continue", 0) == 1)
         //{
         //    enablecont = true;

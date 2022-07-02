@@ -9,6 +9,7 @@ public class Column : MonoBehaviour, IPooledObject
     public float colunaInferiorMin;
     public float GapMax;
     public float GapMin;
+    public float velocity;
 
     public void Start()
     {
@@ -16,7 +17,8 @@ public class Column : MonoBehaviour, IPooledObject
         float spawnGapPosition = UnityEngine.Random.Range(GapMax, GapMin);
         transform.GetChild(0).position = new Vector2(22, spawnYPosition);
         transform.GetChild(1).position = new Vector2(22, spawnYPosition+spawnGapPosition);
-        GetComponent<Rigidbody2D>().velocity = new Vector2(-5, 0);
+        velocity = GameControl.instance.scrollSpeed;
+        GetComponent<Rigidbody2D>().velocity = new Vector2(velocity, 0);
     }
 
     public void OnObjectSpawn()
@@ -34,14 +36,30 @@ public class Column : MonoBehaviour, IPooledObject
         {
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
         }
+        else
+        {
+            velocity = GameControl.instance.scrollSpeed;
+            GetComponent<Rigidbody2D>().velocity = new Vector2(velocity, 0);
+            if(transform.position.x < -16)
+            {
+                gameObject.SetActive(false);
+            }
+        }
     }
 
 private void OnTriggerEnter2D (Collider2D other)
     {
-        if (other.GetComponent<bird>() != null)
+        if (GameControl.instance.isDash)
+        {
+
+        }
+
+        if (other.gameObject.name == "Bird")
         {
             GameControl.instance.BirdScored();
         }
+
+
     }
 
 }

@@ -8,7 +8,11 @@ public class RepetingBackground : MonoBehaviour
    
     private BoxCollider2D groundCollider;
     private float groundHorizontalLength;
-   
+    public float timermap = 0;
+    private bool transitionGround = false;
+
+    [SerializeField] private Sprite[] spriteList;
+    public SpriteRenderer spriteRenderer;
 
     // Start is called before the first frame update
     void Start()
@@ -24,8 +28,8 @@ public class RepetingBackground : MonoBehaviour
         {
             RepositionBackground();
         }
+        timermap += Time.deltaTime;
 
-     
     }
 
     private void RepositionBackground()
@@ -33,7 +37,24 @@ public class RepetingBackground : MonoBehaviour
         Vector2 groundOffset = new Vector2(groundHorizontalLength * 2f, 0);
         transform.position = (Vector2)transform.position + groundOffset;
 
+        if (transitionGround)
+        {
+            transitionGround = false;
+            GameControl.instance.groundIndex++;
+            timermap = 0;
+        }
+        if (timermap > 6)
+        {
+            GameControl.instance.groundIndex++;
+            transitionGround = true;
+        }
 
+        if(GameControl.instance.groundIndex >2)
+        {
+            GameControl.instance.groundIndex = 0;
+        }
+
+        spriteRenderer.sprite = spriteList[GameControl.instance.groundIndex];
     }
 
    

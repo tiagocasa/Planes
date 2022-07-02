@@ -49,21 +49,6 @@ public class Shop : MonoBehaviour
         highScore.text = "HIGHSCORE:" + PlayerPrefs.GetInt("HighScore", 0).ToString();
         coinText.text = "MOEDAS:" + PlayerPrefs.GetInt("Coins", 0).ToString();
 
-        if (PlayerPrefs.GetInt("SkinSelecionada") == 5)
-        {
-            SkinSelec.GetComponent<Image>().sprite = SkinM1;
-        }
-        else if (PlayerPrefs.GetInt("SkinSelecionada") == 6)
-        {
-            SkinSelec.GetComponent<Image>().sprite = SkinM2;
-        }
-        else
-        {
-            SkinSelec.GetComponent<Image>().sprite = SkinM0;
-        }
-        SkinSelec.GetComponent<Image>().color = new Color(PlayerPrefs.GetFloat("SkinSelecionadaRed", 255), PlayerPrefs.GetFloat("SkinSelecionadaGreen", 255), PlayerPrefs.GetFloat("SkinSelecionadaBlue", 255), 255);
-
-
         // Criar Lista das Skins
         ItemTemplate = ShopScrollView.GetChild(0).gameObject;
         int len = ShopItemsList.Count;

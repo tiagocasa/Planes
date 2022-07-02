@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class pointCount : MonoBehaviour
 {
-   
-
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.name == "Bird")

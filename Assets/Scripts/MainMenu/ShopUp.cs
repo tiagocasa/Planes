@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.UI;
-
+using TMPro;
 public class ShopUp : MonoBehaviour
 {
     [System.Serializable]
@@ -15,8 +15,6 @@ public class ShopUp : MonoBehaviour
         public int Price;
         public int Highscore;
         public bool isPurchased = false;
-
-
     }
 
     [SerializeField] List<ShopItem> ShopItemsList;
@@ -42,21 +40,10 @@ public class ShopUp : MonoBehaviour
         }
         PlayerPrefs.SetInt("CHOPPER", 1);
 
-        //Somente para testes
-        //PlayerPrefs.SetInt("Coins", 100);
-        //PlayerPrefs.SetInt("HighScore", 100);
-
-        //PlayerPrefs que vamos utilizar
-        //PlayerPrefs.GetInt("ShopMoeda",0);
-        //PlayerPrefs.GetInt("ShopTurbo", 0);
-        //PlayerPrefs.GetInt("ShopIma", 0);
-        //PlayerPrefs.GetInt("ShopGasolina", 0);
-
-
 
         //Arumar Moedas e Highscore
-        highScore.text = "HIGHSCORE:" + PlayerPrefs.GetInt("HighScore", 0).ToString();
-        coinText.text = "MOEDAS:" + PlayerPrefs.GetInt("Coins", 0).ToString();
+       // highScore.text = "HIGHSCORE:" + PlayerPrefs.GetInt("HighScore", 0).ToString();
+        //coinText.text = "MOEDAS:" + PlayerPrefs.GetInt("Coins", 0).ToString();
 
 
 
@@ -67,71 +54,71 @@ public class ShopUp : MonoBehaviour
         for (int i = 0; i < len; i++)
         {
             g = Instantiate(ItemTemplate, ShopScrollView);
-            g.transform.GetChild(0).GetComponent<Image>().sprite = ShopItemsList[i].Image;
-            ShopScrollView.GetChild(i + 1).GetChild(3).GetComponent<Text>().text = ShopItemsList[i].Descricao;
+            g.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = ShopItemsList[i].Image;
+            g.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = ShopItemsList[i].Descricao;
             // If para ver se ja tem essa skins, se sim aparecer texto Ativar"
-            string nomeSkin = ShopItemsList[i].Nome;
+            string shopitem = ShopItemsList[i].Nome;
 
 
-            if (PlayerPrefs.GetInt(nomeSkin, 0) == 0)
+            if (PlayerPrefs.GetInt(shopitem, 0) == 0)
             {
-                g.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = ShopItemsList[i].Price.ToString();
-                g.transform.GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + ShopItemsList[i].Highscore.ToString();
-                g.transform.GetChild(4).GetComponent<Text>().text = "X0";
+                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = ShopItemsList[i].Price.ToString();
+                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + ShopItemsList[i].Highscore.ToString();
+                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X0";
             }
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 1)
+            else if (PlayerPrefs.GetInt(shopitem, 0) == 1)
             {
                 int preco = ShopItemsList[i].Price;
                 preco *= 2;
                 int hs = ShopItemsList[i].Highscore;
                 hs *= 2;
-                g.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                g.transform.GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                g.transform.GetChild(4).GetComponent<Text>().text = "X1";
+                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco.ToString();
+                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + hs.ToString();
+                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X1";
             }
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 2)
+            else if (PlayerPrefs.GetInt(shopitem, 0) == 2)
             {
                 int preco = ShopItemsList[i].Price;
                 preco *= 3;
                 int hs = ShopItemsList[i].Highscore;
                 hs *= 3;
-                g.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                g.transform.GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                g.transform.GetChild(4).GetComponent<Text>().text = "X2";
+                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco.ToString();
+                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + hs.ToString();
+                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X2";
             }
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 3)
+            else if (PlayerPrefs.GetInt(shopitem, 0) == 3)
             {
                 int preco = ShopItemsList[i].Price;
                 preco *= 4;
                 int hs = ShopItemsList[i].Highscore;
                 hs *= 4;
-                g.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                g.transform.GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                g.transform.GetChild(4).GetComponent<Text>().text = "X3";
+                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco.ToString();
+                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + hs.ToString();
+                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X3";
             }
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 4)
+            else if (PlayerPrefs.GetInt(shopitem, 0) == 4)
             {
                 int preco = ShopItemsList[i].Price;
                 preco *= 4;
                 int hs = ShopItemsList[i].Highscore;
                 hs *= 4;
-                g.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                g.transform.GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                g.transform.GetChild(4).GetComponent<Text>().text = "X4";
+                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco.ToString();
+                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + hs.ToString();
+                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X4";
             }
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 5)
+            else if (PlayerPrefs.GetInt(shopitem, 0) == 5)
             {
-                ShopScrollView.GetChild(i + 1).GetChild(1).gameObject.SetActive(false);
-                ShopScrollView.GetChild(i + 1).GetChild(3).GetComponent<Text>().text = "TOTALMENTE MELHORADO";
-                g.transform.GetChild(4).GetComponent<Text>().text = "X5";
+                //ShopScrollView.GetChild(i + 1).GetChild(1).gameObject.SetActive(false);
+                //ShopScrollView.GetChild(i + 1).GetChild(3).GetComponent<TMP_Text>().text = "TOTALMENTE MELHORADO";
+                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X5";
             }
 
 
-            buyBtn = g.transform.GetChild(5).GetComponent<Button>();
+            buyBtn = g.transform.GetChild(2).GetComponent<Button>();
             buyBtn.interactable = !ShopItemsList[i].isPurchased;
             buyBtn.AddEventListener(i, OnShopItemBtnClicked);
 
-            g.transform.GetChild(2).GetComponent<Text>().text = ShopItemsList[i].Nome;
+            g.transform.GetChild(1).GetComponent<TMP_Text>().text = ShopItemsList[i].Nome;
         }
 
         Destroy(ItemTemplate);
