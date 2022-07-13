@@ -17,108 +17,147 @@ public class ShopUp : MonoBehaviour
         public bool isPurchased = false;
     }
 
+    private string novaDescricao;
+    private string preco;
+    private int nivel;
+
+    private FirebaseManager fm;
+
+
     [SerializeField] List<ShopItem> ShopItemsList;
     [SerializeField] Animator SemMoeda;
-    [SerializeField] Animator SemHC;
-
-    public Text coinText;
-    public Text highScore;
 
     GameObject ItemTemplate;
-    GameObject g;
+    GameObject shopContainer;
     [SerializeField] Transform ShopScrollView;
+    [SerializeField] private TMP_Text cashText;
+    [SerializeField] private TMP_Text coinText;
 
     Button buyBtn;
+
+    private int[] coinChancePrice = { 10, 100, 500, 1000 };
+    private int[] gasPrice = { 10, 100, 500, 1000 };
+    private int[] magnetPrice = { 10, 100, 500, 1000 };
+    private int[] turboPrice = { 10, 100, 500, 1000 };
 
     // Start is called before the first frame update
     void Start()
     {
-        
-        if (PlayerPrefs.GetInt("APARECER MOEDAS", 0) == 0)
-        {
-            PlayerPrefs.SetInt("APARECER MOEDAS", 1);
-        }
-        PlayerPrefs.SetInt("CHOPPER", 1);
-
-
-        //Arumar Moedas e Highscore
-       // highScore.text = "HIGHSCORE:" + PlayerPrefs.GetInt("HighScore", 0).ToString();
-        //coinText.text = "MOEDAS:" + PlayerPrefs.GetInt("Coins", 0).ToString();
-
-
-
+        fm = FindObjectOfType<FirebaseManager>();
+        cashText.text = MenuManager.instance.Cash.ToString();
+        coinText.text = MenuManager.instance.TotalCoins.ToString();
         // Criar Lista das Skins
         ItemTemplate = ShopScrollView.GetChild(0).gameObject;
         int len = ShopItemsList.Count;
 
         for (int i = 0; i < len; i++)
         {
-            g = Instantiate(ItemTemplate, ShopScrollView);
-            g.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = ShopItemsList[i].Image;
-            g.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = ShopItemsList[i].Descricao;
+            shopContainer = Instantiate(ItemTemplate, ShopScrollView);
+            shopContainer.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = ShopItemsList[i].Image;
+
+
+
             // If para ver se ja tem essa skins, se sim aparecer texto Ativar"
             string shopitem = ShopItemsList[i].Nome;
 
+            if(shopitem == "Coin Spawn Chance")
+            {
+                if (MenuManager.instance.LevelCoin >= 4)
+                {
+                    novaDescricao = $"Chance of Spawning coins of {MenuManager.instance.ChanceCoin[MenuManager.instance.LevelCoin]}%";
+                    preco = "MAX";
+                    nivel = MenuManager.instance.LevelCoin;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = false;
+                }
+                else
+                {
+                    novaDescricao = $"Upgrade to increase the spawn chance of coins to {MenuManager.instance.ChanceCoin[MenuManager.instance.LevelCoin + 1]}%";
+                    preco = coinChancePrice[MenuManager.instance.LevelCoin].ToString();
+                    nivel = MenuManager.instance.LevelCoin;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = true;
+                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                }
+                shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.ChanceCoin[MenuManager.instance.LevelCoin]}%"; // mudar pro valor
+            }
+            else if(shopitem == "Gasoline Refill")
+            {
+                // novaDescricao = $"Increase the ammount of gasoline recovered to {MenuManager.instance.quantityGas[MenuManager.instance.LevelGas + 1]}%";
+                if (MenuManager.instance.LevelGas >= 4)
+                {
+                    novaDescricao = $"Increases the ammount of gasoline recovered to {MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas]}%";
+                    preco = "MAX";
+                    nivel = MenuManager.instance.LevelGas;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = false;
+                }
+                else
+                {
+                    novaDescricao = $"Upgrade to increase the ammount of gasoline recovered to {MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas + 1]}%";
+                    preco = gasPrice[MenuManager.instance.LevelGas].ToString();
+                    nivel = MenuManager.instance.LevelGas;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = true;
+                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                }
+                shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas]}%"; // mudar pro valor
 
-            if (PlayerPrefs.GetInt(shopitem, 0) == 0)
-            {
-                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = ShopItemsList[i].Price.ToString();
-                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + ShopItemsList[i].Highscore.ToString();
-                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X0";
             }
-            else if (PlayerPrefs.GetInt(shopitem, 0) == 1)
+            else if (shopitem == "Magnet Duration")
             {
-                int preco = ShopItemsList[i].Price;
-                preco *= 2;
-                int hs = ShopItemsList[i].Highscore;
-                hs *= 2;
-                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco.ToString();
-                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + hs.ToString();
-                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X1";
+                // novaDescricao = $"Increase the duration of the Magnet effect to {MenuManager.instance.durationMagnet[MenuManager.instance.LevelMagnet + 1]} sec";
+                if (MenuManager.instance.LevelMagnet >= 4)
+                {
+                    novaDescricao = $"Increases the duration of the magnet effect to {MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet]} sec";
+                    preco = "MAX";
+                    nivel = MenuManager.instance.LevelMagnet;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = false;
+                }
+                else
+                {
+                    novaDescricao = $"Upgrade to increase the duration of the magnet effect to {MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet + 1]} sec";
+                    preco = magnetPrice[MenuManager.instance.LevelMagnet].ToString();
+                    nivel = MenuManager.instance.LevelMagnet;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = true;
+                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                }
+                shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet]} sec"; // mudar pro valor
             }
-            else if (PlayerPrefs.GetInt(shopitem, 0) == 2)
+            else if (shopitem == "Turbo Duration")
             {
-                int preco = ShopItemsList[i].Price;
-                preco *= 3;
-                int hs = ShopItemsList[i].Highscore;
-                hs *= 3;
-                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco.ToString();
-                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + hs.ToString();
-                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X2";
+                // novaDescricao = $"Increase the duration of the Turbo effet {MenuManager.instance.durationTurbo[MenuManager.instance.LevelTurbo + 1]} sec";
+                if (MenuManager.instance.LevelTurbo >= 4)
+                {
+                    novaDescricao = $"Increases the duration of the turbo effect to {MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo]} sec";
+                    preco = "MAX";
+                    nivel = MenuManager.instance.LevelTurbo;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = false;
+                }
+                else
+                {
+                    novaDescricao = $"Upgrade to increase the duration of the turbo effect to {MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo + 1]} sec";
+                    preco = coinChancePrice[MenuManager.instance.LevelTurbo].ToString();
+                    nivel = MenuManager.instance.LevelTurbo;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = true;
+                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                }
+                shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo]} sec"; // mudar pro valor
             }
-            else if (PlayerPrefs.GetInt(shopitem, 0) == 3)
-            {
-                int preco = ShopItemsList[i].Price;
-                preco *= 4;
-                int hs = ShopItemsList[i].Highscore;
-                hs *= 4;
-                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco.ToString();
-                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + hs.ToString();
-                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X3";
-            }
-            else if (PlayerPrefs.GetInt(shopitem, 0) == 4)
-            {
-                int preco = ShopItemsList[i].Price;
-                preco *= 4;
-                int hs = ShopItemsList[i].Highscore;
-                hs *= 4;
-                g.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco.ToString();
-                g.transform.GetChild(3).GetChild(0).GetComponent<TMP_Text>().text = "HIGHSCORE:" + hs.ToString();
-                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X4";
-            }
-            else if (PlayerPrefs.GetInt(shopitem, 0) == 5)
-            {
-                //ShopScrollView.GetChild(i + 1).GetChild(1).gameObject.SetActive(false);
-                //ShopScrollView.GetChild(i + 1).GetChild(3).GetComponent<TMP_Text>().text = "TOTALMENTE MELHORADO";
-                g.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = "X5";
-            }
+                       
+            
+            
+            shopContainer.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = novaDescricao;
+            shopContainer.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco;
+            
 
+           
 
-            buyBtn = g.transform.GetChild(2).GetComponent<Button>();
-            buyBtn.interactable = !ShopItemsList[i].isPurchased;
-            buyBtn.AddEventListener(i, OnShopItemBtnClicked);
-
-            g.transform.GetChild(1).GetComponent<TMP_Text>().text = ShopItemsList[i].Nome;
+            shopContainer.transform.GetChild(1).GetComponent<TMP_Text>().text = ShopItemsList[i].Nome;
         }
 
         Destroy(ItemTemplate);
@@ -126,180 +165,178 @@ public class ShopUp : MonoBehaviour
 
     void OnShopItemBtnClicked(int itemIndex)
     {
-        int coinsshop = PlayerPrefs.GetInt("Coins");
-        int high = PlayerPrefs.GetInt("HighScore");
-        int preco = ShopItemsList[itemIndex].Price;
-        int hs = ShopItemsList[itemIndex].Highscore;
+        int coinsshop = MenuManager.instance.TotalCoins;
+        int high = MenuManager.instance.Highscore;
         string nomeSkin = ShopItemsList[itemIndex].Nome;
+
         Debug.Log(PlayerPrefs.GetInt(nomeSkin));
 
-        //Verifica se ja tem a skin comprada
-        if (PlayerPrefs.GetInt(nomeSkin) == 5)
+        //Verifica se tem moeda
+        shopContainer = ShopScrollView.GetChild(itemIndex).gameObject;
+        buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+
+        if (itemIndex == 0)
         {
-            FindObjectOfType<AudioManagerMenu>().Play("voltar");
-            ShopItemsList[itemIndex].isPurchased = true;
+            int precoLocal = coinChancePrice[MenuManager.instance.LevelCoin];
 
+            if (coinsshop >= precoLocal)
+            {
+                FindObjectOfType<AudioManager>().Play("botao");
+                MenuManager.instance.TotalCoins -= precoLocal;
+                MenuManager.instance.LevelCoin++;
+                if (MenuManager.instance.LevelCoin >= 4)
+                {
+                    novaDescricao = $"Chance of Spawning coins of {MenuManager.instance.ChanceCoin[MenuManager.instance.LevelCoin]}%";
+                    preco = "MAX";
+                    nivel = MenuManager.instance.LevelCoin;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = false;
+                }
+                else
+                {
+                    novaDescricao = $"Increase the spawn chance of coins to {MenuManager.instance.ChanceCoin[MenuManager.instance.LevelCoin + 1]}%";
+                    preco = coinChancePrice[MenuManager.instance.LevelCoin].ToString();
+                    nivel = MenuManager.instance.LevelCoin;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = true;
+                    //buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                }
+
+                shopContainer.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = novaDescricao;
+                shopContainer.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco;
+                shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.ChanceCoin[MenuManager.instance.LevelCoin]}%"; // mudar pro valor
+
+                fm.SaveDataButton();
+
+
+            }
+            else
+            {
+                SemMoeda.SetTrigger("SemMoeda");
+                FindObjectOfType<AudioManager>().Play("voltar");
+            }
         }
-        else
+        else if (itemIndex == 1)
         {
-            //Verifica se tem moeda
-
-            buyBtn = ShopScrollView.GetChild(itemIndex).GetChild(5).GetComponent<Button>();
-            FindObjectOfType<AudioManagerMenu>().Play("botao");
-
-            if (PlayerPrefs.GetInt(nomeSkin, 0) == 0)
+            int precoLocal = gasPrice[MenuManager.instance.LevelGas];
+            if (coinsshop >= precoLocal)
             {
-                if (coinsshop >= ShopItemsList[itemIndex].Price)
+                FindObjectOfType<AudioManager>().Play("botao");
+                MenuManager.instance.TotalCoins -= precoLocal;
+                MenuManager.instance.LevelGas++;
+                if (MenuManager.instance.LevelGas >= 4)
                 {
-                    if (high >= ShopItemsList[itemIndex].Highscore)
-                    {
-                        preco = ShopItemsList[itemIndex].Price;
-                        coinsshop -= preco;
-                        preco = ShopItemsList[itemIndex].Price * 2;
-                        hs = ShopItemsList[itemIndex].Highscore * 2;
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(4).GetComponent<Text>().text = "X1";
-
-                        PlayerPrefs.SetInt(nomeSkin, 1);
-                    }
-                    else
-                    {
-                        SemHC.SetTrigger("SemHC");
-                        FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                    }
-
+                    novaDescricao = $"Increases the ammount of gasoline recovered to {MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas]}%";
+                    preco = "MAX";
+                    nivel = MenuManager.instance.LevelGas;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = false;
                 }
                 else
                 {
-                    SemMoeda.SetTrigger("SemMoeda");
-                    FindObjectOfType<AudioManagerMenu>().Play("voltar");
+                    novaDescricao = $"Upgrade to increases the ammount of gasoline recovered to {MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas + 1]}%";
+                    preco = coinChancePrice[MenuManager.instance.LevelGas].ToString();
+                    nivel = MenuManager.instance.LevelGas;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = true;
                 }
-            }
 
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 1)
+                shopContainer.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = novaDescricao;
+                shopContainer.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco;
+                shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas]}%"; // mudar pro valor
+
+                fm.SaveDataButton();
+            }
+            else
             {
-                if (coinsshop >= ShopItemsList[itemIndex].Price * 2)
-                {
-                    if (high >= ShopItemsList[itemIndex].Highscore * 2)
-                    {
-                        preco = ShopItemsList[itemIndex].Price * 2;
-                        coinsshop -= preco;
-                        preco = ShopItemsList[itemIndex].Price * 3;
-                        hs = ShopItemsList[itemIndex].Highscore * 3;
-
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(4).GetComponent<Text>().text = "X2";
-                        PlayerPrefs.SetInt(nomeSkin, 2);
-                    }
-                    else
-                    {
-                        SemHC.SetTrigger("SemHC");
-                        FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                    }
-                }
-                else
-                {
-                    SemMoeda.SetTrigger("SemMoeda");
-                    FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                }
-
+                SemMoeda.SetTrigger("SemMoeda");
+                FindObjectOfType<AudioManager>().Play("voltar");
             }
-
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 2)
-            {
-                if (coinsshop >= ShopItemsList[itemIndex].Price * 3)
-                {
-                    if (high >= ShopItemsList[itemIndex].Highscore * 3)
-                    {
-                        preco = ShopItemsList[itemIndex].Price * 3;
-                        coinsshop -= preco;
-                        preco = ShopItemsList[itemIndex].Price * 4;
-                        hs = ShopItemsList[itemIndex].Highscore * 4;
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(4).GetComponent<Text>().text = "X3";
-                        PlayerPrefs.SetInt(nomeSkin, 3);
-                    }
-                    else
-                    {
-                        SemHC.SetTrigger("SemHC");
-                        FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                    }
-                }
-                else
-                {
-                    SemMoeda.SetTrigger("SemMoeda");
-                    FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                }
-
-            }
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 3)
-            {
-                if (coinsshop >= ShopItemsList[itemIndex].Price * 4)
-                {
-                    if (high >= ShopItemsList[itemIndex].Highscore * 4)
-                    {
-                        preco = ShopItemsList[itemIndex].Price * 4;
-                        coinsshop -= preco;
-                        preco = ShopItemsList[itemIndex].Price * 5;
-                        hs = ShopItemsList[itemIndex].Highscore * 5;
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(4).GetComponent<Text>().text = "X4";
-                        PlayerPrefs.SetInt(nomeSkin, 4);
-                    }
-                    else
-                    {
-                        SemHC.SetTrigger("SemHC");
-                        FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                    }
-                }
-                else
-                {
-                    SemMoeda.SetTrigger("SemMoeda");
-                    FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                }
-
-            }
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 4)
-            {
-                if (coinsshop >= ShopItemsList[itemIndex].Price * 5)
-                {
-                    if (high >= ShopItemsList[itemIndex].Highscore * 5)
-                    {
-                        preco = ShopItemsList[itemIndex].Price * 5;
-                        coinsshop -= preco;
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(0).GetComponent<Text>().text = preco.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).GetChild(1).GetComponent<Text>().text = "HIGHSCORE:" + hs.ToString();
-                        ShopScrollView.GetChild(itemIndex).GetChild(4).GetComponent<Text>().text = "X5";
-                        PlayerPrefs.SetInt(nomeSkin, 5);
-                        ShopScrollView.GetChild(itemIndex).GetChild(1).gameObject.SetActive(false);
-                        ShopScrollView.GetChild(itemIndex).GetChild(3).GetComponent<Text>().text = "TOTALMENTE MELHORADO";
-                    }
-                    else
-                    {
-                        SemHC.SetTrigger("SemHC");
-                        FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                    }
-                }
-                else
-                {
-                    SemMoeda.SetTrigger("SemMoeda");
-                    FindObjectOfType<AudioManagerMenu>().Play("voltar");
-                }
-
-
-            }
-            else if (PlayerPrefs.GetInt(nomeSkin, 0) == 5)
-            {
-
-                FindObjectOfType<AudioManagerMenu>().Play("voltar");
-            }
-            PlayerPrefs.SetInt("Coins", coinsshop);
-            coinText.text = "MOEDAS:" + PlayerPrefs.GetInt("Coins", 0).ToString();
         }
+        else if(itemIndex == 2)
+        {
+            int precoLocal = magnetPrice[MenuManager.instance.LevelMagnet];
+            if (coinsshop >= precoLocal)
+            {
+                FindObjectOfType<AudioManager>().Play("botao");
+                MenuManager.instance.TotalCoins -= precoLocal;
+                MenuManager.instance.LevelMagnet++;
+                if (MenuManager.instance.LevelMagnet >= 4)
+                {
+                    novaDescricao = $"Increases the duration of the magnet effect by {MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet]}sec";
+                    preco = "MAX";
+                    nivel = MenuManager.instance.LevelMagnet;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = false;
+                }
+                else
+                {
+                    novaDescricao = $"Upgrade to increase the duration of the magnet effect by {MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet + 1]}sec";
+                    preco = coinChancePrice[MenuManager.instance.LevelMagnet].ToString();
+                    nivel = MenuManager.instance.LevelMagnet;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = true;
+                }
+
+                shopContainer.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = novaDescricao;
+                shopContainer.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco;
+                shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet]} sec"; // mudar pro valor
+
+                fm.SaveDataButton();
+            }
+            else
+            {
+                SemMoeda.SetTrigger("SemMoeda");
+                FindObjectOfType<AudioManager>().Play("voltar");
+            }
+        }
+        else if(itemIndex == 3)
+        {
+            int precoLocal = turboPrice[MenuManager.instance.LevelTurbo];
+            if (coinsshop >= precoLocal)
+            {
+                FindObjectOfType<AudioManager>().Play("botao");
+                MenuManager.instance.TotalCoins -= precoLocal;
+                MenuManager.instance.LevelTurbo++;
+                if (MenuManager.instance.LevelTurbo >= 4)
+                {
+                    novaDescricao = $"Increases the duration of the magnet effect by {MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo]} sec";
+                    preco = "MAX";
+                    nivel = MenuManager.instance.LevelTurbo;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = false;
+                }
+                else
+                {
+                    novaDescricao = $"Upgrade to increase the duration of the magnet effect by {MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo + 1]} sec";
+                    preco = coinChancePrice[MenuManager.instance.LevelTurbo].ToString();
+                    nivel = MenuManager.instance.LevelTurbo;
+                    buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+                    buyBtn.interactable = true;
+                }
+
+                shopContainer.transform.GetChild(0).GetChild(1).GetComponent<TMP_Text>().text = novaDescricao;
+                shopContainer.transform.GetChild(2).GetChild(1).GetComponent<TMP_Text>().text = preco;
+                shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo]} sec"; // mudar pro valor
+
+                fm.SaveDataButton();
+            }
+            else
+            {
+                SemMoeda.SetTrigger("SemMoeda");
+                FindObjectOfType<AudioManager>().Play("voltar");
+            }
+        }
+
+        cashText.text = MenuManager.instance.Cash.ToString();
+        coinText.text = MenuManager.instance.TotalCoins.ToString();
+
+
+
+        ////Update Coins
+        //PlayerPrefs.SetInt("Coins", coinsshop);
+        //coinText.text = "MOEDAS:" + PlayerPrefs.GetInt("Coins", 0).ToString();
+
     }
 }
 

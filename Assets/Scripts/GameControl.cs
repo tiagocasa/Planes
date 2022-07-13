@@ -82,59 +82,35 @@ public class GameControl : MonoBehaviour
             Destroy(gameObject);
         }
 
-        //manager = GameObject.Find("Firebase Manager").GetComponent<FirebaseManager>();
-
+        manager = GameObject.Find("Firebase Manager").GetComponent<FirebaseManager>();
+            
         coins = 0;
         coinText.text = coins.ToString();
 
-        //highScore.text = "HIGHSCORE:" + PlayerPrefs.GetInt("HighScore", 0).ToString();
+        score = 0;
+        scoreText.text = "0";
+       
+        TempoDash = MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo];
+        TempoIma = MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet];
 
-        //coinText.text = PlayerPrefs.GetInt("Coins", 0).ToString();
-        //coins = PlayerPrefs.GetInt("Coins", 0);
-        //scoreText.text = "SCORE:" + score.ToString();
-
-        // Botão do add 
-        if (PlayerPrefs.GetInt("Continue", 0) == 1)
-        {
-            score = PlayerPrefs.GetInt("Score", 0);
-            scoreText.text = "SCORE:" + PlayerPrefs.GetInt("Score", 0).ToString();
-        }
-        else
-        {
-            score = 0;
-            scoreText.text = "SCORE:0";
-        }
-
-        PlayerPrefs.SetString("nome od maluco", "Egil o bebado");
-
-
-
-        TempoDash = 5f;//PlayerPrefs.GetInt("TEMPO DO TURBO", 0) * 10f;
-        TempoIma = 15f;//PlayerPrefs.GetInt("TEMPO DO IMÃ", 0) * 5f;
-
-        if (PlayerPrefs.GetInt("Continue", 0) == 1)
-        {
-            PlayerPrefs.SetInt("Continue", 0);
-        }
-        else
-        {
-            PlayerPrefs.SetInt("Continue", 1);
-        }
-
-        //coinGO.text = totalCoins.ToString();
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        gasoline -= Time.deltaTime;
-        if (gasoline <= 0)
+        
+        if(!gameOver)
         {
-            gameOver = true;
-        }
-        else
-        {
+            if (!isDash)
+            {
+                gasoline -= Time.deltaTime;
+            }
+            else
+            {
+                //gasoline -= (Time.deltaTime*5);
+            }
+           
             gasolineSlider.value = gasoline;
         }
 
@@ -168,7 +144,7 @@ public class GameControl : MonoBehaviour
         }
 
 
-        scrollSpeed -= (Time.deltaTime * 0.05f);
+        scrollSpeed -= (Time.deltaTime * 0.01f);
 
         if (isDash && !gameOver && timedash > TempoDash)
         {
@@ -190,27 +166,26 @@ public class GameControl : MonoBehaviour
     public void BirdDied()
     {
         //fazer efeito https://www.youtube.com/watch?v=CfX002SPWmU&ab_channel=Unity3DSchool
-        totalCoins += coins;
+        MenuManager.instance.TotalCoins += coins;
         coins = 0;
-        //manager.SaveDataButton();
+        
 
 
-        coinGO.text = totalCoins.ToString();
+        coinGO.text = MenuManager.instance.TotalCoins.ToString();
         coinText.text = coins.ToString();
         highscoreGO.text = score.ToString();
         gameOverText.SetActive(true);
         gameHUD.SetActive(false);
         gameOver = true;
-        PlayerPrefs.SetInt("Score", score);
 
-
-        if (score > PlayerPrefs.GetInt("HighScore", 0))
+        
+        if (score > MenuManager.instance.Highscore)
         {
-            PlayerPrefs.SetInt("HighScore", score);
-            // Efeito de parabens
+            MenuManager.instance.SetHighscore(score.ToString());
             highScore.text = "HIGHSCORE:" + score.ToString();
         }
-        
+
+        manager.SaveDataButton();
 
     }
 
@@ -265,7 +240,7 @@ public class GameControl : MonoBehaviour
 
     public void GasolinaPickUp()
     {
-        gasoline = 100;
+        gasoline += MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas];
         if (gasoline > 100) { gasoline = 100; }
     }
 

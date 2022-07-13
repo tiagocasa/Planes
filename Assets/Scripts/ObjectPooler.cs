@@ -71,6 +71,11 @@ public class ObjectPooler : MonoBehaviour
         poolDictionary[tag].Enqueue(objectToSpawn);
 
         objectToSpawn.SetActive(true);
+        if (tag == "postes" || tag =="arvore" || tag =="torre" || tag=="moinho")
+        {
+            objectToSpawn.transform.GetChild(0).gameObject.SetActive(true);
+            objectToSpawn.transform.GetChild(1).gameObject.SetActive(true);
+        }
         return objectToSpawn;
     }
 

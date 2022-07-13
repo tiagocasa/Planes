@@ -6,6 +6,9 @@ using Firebase.Database;
 using TMPro;
 using System.Linq;
 using Newtonsoft.Json;
+using System;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -35,9 +38,19 @@ public class FirebaseManager : MonoBehaviour
     [Header("UserData")]
     public TMP_Text username    ;
 
-    public GameObject scoreElement;
-    public Transform scoreboardContent;
+    [Header("LoadinScreen")]
+    public GameObject loadingScreen;
+    public TMP_Text loadingText;
+    public TMP_Text errorText;
+    
+    public Button retryBtn;
+
+    GameObject ItemTemplate;
+    [SerializeField] GameObject RankingContent;
+    [SerializeField] Transform RankScrollView;
     static public bool once_call;
+
+  
 
     private void Start()
     {
@@ -48,6 +61,7 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
+           
             Destroy(gameObject);
         }
 
@@ -68,7 +82,7 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("nao sei o que eu to fazndo)");
+            Debug.Log("seminternet");
         }
         
     }
@@ -80,7 +94,7 @@ public class FirebaseManager : MonoBehaviour
         auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
             {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                
                 return;
             }
             if (task.IsFaulted)
@@ -94,7 +108,7 @@ public class FirebaseManager : MonoBehaviour
                 newUser.DisplayName, newUser.UserId);
             FirebaseDatabase.DefaultInstance.GetReference("Player Status").Child(newUser.UserId).SetRawJsonValueAsync(JsonConvert.SerializeObject(new PlayerStatus().Initialize()));
             MenuManager.instance.AccountCreations();
-            MenuManager.instance.ScreenUpdate();
+            
         });
     }
     private void InitializeFirebase()
@@ -134,16 +148,18 @@ public class FirebaseManager : MonoBehaviour
     {
         if(user != null)
         {
-            Debug.Log("AutoLogin 2");
-            StartCoroutine(LoadUserData());
-
-
+            StartCoroutine(LoadUserData(ScreenUp));
+            
         }
         else
         {
             StartAnonimous();
-            Debug.Log("Criando usuario anonimo 2");
         }
+    }
+
+    public void ScreenUp()
+    {
+        FindObjectOfType<NewMenu>().ScreenUpdate();
     }
 
     void AuthStateChanged(object sender, System.EventArgs eventArgs)
@@ -210,14 +226,16 @@ public class FirebaseManager : MonoBehaviour
     //Function for the save button
     public void SaveDataButton()
     {
-        StartCoroutine(UpdateCoin(GameControl.instance.TotalCoins));
-
-        //StartCoroutine(UpdateUsernameAuth(usernameField.text));
-        //StartCoroutine(UpdateUsernameDatabase(usernameField.text));
-
-        //StartCoroutine(UpdateXp(int.Parse(xpField.text)));
-        //StartCoroutine(UpdateKills(int.Parse(killsField.text)));
-        //StartCoroutine(UpdateDeaths(int.Parse(deathsField.text)));
+        StartCoroutine(UpdateCoinLevel(MenuManager.instance.LevelCoin));
+        StartCoroutine(UpdateCoin(MenuManager.instance.TotalCoins));
+        StartCoroutine(UpdateCash(MenuManager.instance.Cash));
+        StartCoroutine(UpdateGasLevel(MenuManager.instance.LevelGas));
+        StartCoroutine(UpdateMagnetLevel(MenuManager.instance.LevelMagnet));
+        StartCoroutine(UpdateDashLevel(MenuManager.instance.LevelTurbo));
+        if (SceneManager.GetActiveScene().buildIndex == 0)
+        {
+            FindObjectOfType<NewMenu>().ScreenUpdate();
+        }
     }
     //Function for the scoreboard button
     public void ScoreboardButton()
@@ -277,7 +295,7 @@ public class FirebaseManager : MonoBehaviour
             confirmLoginText.text = "";
             ClearLoginFeilds();
             ClearRegisterFeilds();
-            StartCoroutine(LoadUserData());
+            StartCoroutine(LoadUserData(ScreenUp));
 
         }
     }
@@ -356,7 +374,7 @@ public class FirebaseManager : MonoBehaviour
                         warningRegisterText.text = "";
                         ClearRegisterFeilds();
                         ClearLoginFeilds();
-                        StartCoroutine(LoadUserData());
+                        StartCoroutine(LoadUserData(ScreenUp));
                         //FirebaseDatabase.DefaultInstance.GetReference("Player Status").Child(user.UserId).SetRawJsonValueAsync(JsonConvert.SerializeObject(new PlayerStatus().Initialize()));
                     }
                 }
@@ -371,6 +389,27 @@ public class FirebaseManager : MonoBehaviour
 
         }
     }
+
+
+    public  IEnumerator UpdateSkinList(int _skinIndex)
+    {
+        MenuManager.instance.PlayerSkins.Add(_skinIndex);
+       // JsonConvert.
+
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("PlayerSkins").SetValueAsync(MenuManager.instance.PlayerSkins);
+        //
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Coins is now updated
+        }
+    }
+
     private IEnumerator UpdateUsernameAuth(string _username)
     {
         //Create a user profile and set the username
@@ -391,10 +430,10 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    private IEnumerator UpdateUsernameDatabase(string _username)
+    public IEnumerator UpdateSelectSkinName(string _skinName)
     {
         //Set the currently logged in user username in the database
-        var DBTask = DBreference.Child("users").Child(user.UserId).Child("username").SetValueAsync(_username);
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("SkinNameSelected").SetValueAsync(_skinName);
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -408,10 +447,10 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    private IEnumerator UpdateXp(int _xp)
+    private IEnumerator UpdateCash(int _cash)
     {
         //Set the currently logged in user xp
-        var DBTask = DBreference.Child("users").Child(user.UserId).Child("xp").SetValueAsync(_xp);
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("Cash").SetValueAsync(_cash);
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -440,10 +479,26 @@ public class FirebaseManager : MonoBehaviour
             //Coins is now updated
         }
     }
-    private IEnumerator UpdateKills(int _kills)
+    private IEnumerator UpdateCoinLevel(int _coinLevel)
+    {       
+        //Set the currently logged in user xp
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("CoinUpgrade").SetValueAsync(_coinLevel);
+        //
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Coins is now updated
+        }
+    }
+    private IEnumerator UpdateGasLevel(int _gasLevel)
     {
-        //Set the currently logged in user kills
-        var DBTask = DBreference.Child("users").Child(user.UserId).Child("kills").SetValueAsync(_kills);
+        //Set the currently logged in user xp
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("GasUpgrade").SetValueAsync(_gasLevel);
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -453,14 +508,13 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
-            //Kills are now updated
+            //Coins is now updated
         }
     }
-
-    private IEnumerator UpdateDeaths(int _deaths)
+    private IEnumerator UpdateDashLevel(int _dashLevel)
     {
-        //Set the currently logged in user deaths
-        var DBTask = DBreference.Child("users").Child(user.UserId).Child("deaths").SetValueAsync(_deaths);
+        //Set the currently logged in user xp
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("DashUpgrade").SetValueAsync(_dashLevel);
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -470,11 +524,33 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
-            //Deaths are now updated
+            //Coins is now updated
+        }
+    }
+    private IEnumerator UpdateMagnetLevel(int _magnetLevel)
+    {
+        //Set the currently logged in user xp
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("MagnetUpgrade").SetValueAsync(_magnetLevel);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Coins is now updated
         }
     }
 
-    private IEnumerator LoadUserData()
+
+    public void LoadFromAnotherScript()
+    {
+        StartCoroutine(LoadUserData(ScreenUp));
+    }
+
+    public IEnumerator LoadUserData(Action callback)
     {
         //Get the currently logged in user data
         var DBTask = DBreference.Child("Player Status").Child(user.UserId).GetValueAsync();
@@ -487,34 +563,41 @@ public class FirebaseManager : MonoBehaviour
         }
         else if (DBTask.Result.Value == null)
         {
+            Debug.LogWarning(message: $"DB null");
         }
         else
         {
-            //Data has been retrieved
+            
+             //Data has been retrieved
             DataSnapshot snapshot = DBTask.Result;
+            
+            
 
+            MenuManager.instance.SetUserName(snapshot.Child("Username").Value.ToString());
             MenuManager.instance.SetCoin(snapshot.Child("Coins").Value.ToString());
             MenuManager.instance.SetCash(snapshot.Child("Cash").Value.ToString());
             MenuManager.instance.SetHighscore(snapshot.Child("Highscore").Value.ToString());
+            MenuManager.instance.SetCoinLevel(snapshot.Child("CoinUpgrade").Value.ToString());
+            MenuManager.instance.SetGasLevel(snapshot.Child("GasUpgrade").Value.ToString());
+            MenuManager.instance.SetMagnetLevel(snapshot.Child("MagnetUpgrade").Value.ToString());
+            MenuManager.instance.SetTurboLevel(snapshot.Child("DashUpgrade").Value.ToString());
+            MenuManager.instance.SetSkinName(snapshot.Child("SkinNameSelected").Value.ToString());
+            MenuManager.instance.UpdateSkinList(snapshot.Child("PlayerSkins")) ;
 
+            FindObjectOfType<NewMenu>().ScreenUpdate();
 
-            if (user.DisplayName != "")
+            if (callback != null)
             {
-                username.text = user.DisplayName;
+                callback();
             }
-            else
-            {
-                username.text = "Guest";
-            }
-
-            MenuManager.instance.ScreenUpdate();
         }
     }
 
-    private IEnumerator LoadScoreboardData()
+  
+    public IEnumerator LoadScoreboardData()
     {
-        //Get all the users data ordered by kills amount
-        var DBTask = DBreference.Child("users").OrderByChild("kills").GetValueAsync();
+        //Get all the Player Status data ordered by kills amount
+        var DBTask = DBreference.Child("Player Status").OrderByChild("Highscore").GetValueAsync();
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -527,23 +610,74 @@ public class FirebaseManager : MonoBehaviour
             //Data has been retrieved
             DataSnapshot snapshot = DBTask.Result;
 
+            ItemTemplate = RankingContent;
             //Destroy any existing scoreboard elements
-            foreach (Transform child in scoreboardContent.transform)
+            foreach (Transform child in RankScrollView.transform)
             {
                 Destroy(child.gameObject);
             }
 
-            //Loop through every users UID
-            foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>())
+            //Loop through every Player Status UID
+            foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Take(1))
             {
-                string username = childSnapshot.Child("username").Value.ToString();
-                int kills = int.Parse(childSnapshot.Child("kills").Value.ToString());
-                int deaths = int.Parse(childSnapshot.Child("deaths").Value.ToString());
-                int xp = int.Parse(childSnapshot.Child("xp").Value.ToString());
+                string username = childSnapshot.Child("Username").Value.ToString();
+                int highscore = int.Parse(childSnapshot.Child("Highscore").Value.ToString());
+                int avatarid = 1;//int.Parse(childSnapshot.Child("Avatarid").Value.ToString());
+               
 
                 //Instantiate new scoreboard elements
-                GameObject scoreboardElement = Instantiate(scoreElement, scoreboardContent);
-                //scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, kills, deaths, xp);
+                GameObject scoreboardElement = Instantiate(ItemTemplate, RankScrollView);
+                //if (childSnapshot.First() == item)
+                //    item.firstStuff();
+
+                //else if (childSnapshot.Last() == item)
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(1,username, highscore,avatarid);
+            }
+
+            foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Skip(1).Take(1))
+            {
+                string username = childSnapshot.Child("Username").Value.ToString();
+                int highscore = int.Parse(childSnapshot.Child("Highscore").Value.ToString());
+                int avatarid = 1;//int.Parse(childSnapshot.Child("Avatarid").Value.ToString());
+
+
+                //Instantiate new scoreboard elements
+                GameObject scoreboardElement = Instantiate(ItemTemplate, RankScrollView);
+                //if (childSnapshot.First() == item)
+                //    item.firstStuff();
+
+                //else if (childSnapshot.Last() == item)
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(2, username, highscore, avatarid);
+            }
+            foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Skip(2).Take(1))
+            {
+                string username = childSnapshot.Child("Username").Value.ToString();
+                int highscore = int.Parse(childSnapshot.Child("Highscore").Value.ToString());
+                int avatarid = 1;//int.Parse(childSnapshot.Child("Avatarid").Value.ToString());
+
+
+                //Instantiate new scoreboard elements
+                GameObject scoreboardElement = Instantiate(ItemTemplate, RankScrollView);
+                //if (childSnapshot.First() == item)
+                //    item.firstStuff();
+
+                //else if (childSnapshot.Last() == item)
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(3, username, highscore, avatarid);
+            }
+            foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Skip(3).Take(17))
+            {
+                string username = childSnapshot.Child("Username").Value.ToString();
+                int highscore = int.Parse(childSnapshot.Child("Highscore").Value.ToString());
+                int avatarid = 1;//int.Parse(childSnapshot.Child("Avatarid").Value.ToString());
+
+
+                //Instantiate new scoreboard elements
+                GameObject scoreboardElement = Instantiate(ItemTemplate, RankScrollView);
+                //if (childSnapshot.First() == item)
+                //    item.firstStuff();
+
+                //else if (childSnapshot.Last() == item)
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(5, username, highscore, avatarid);
             }
 
             //Go to scoareboard screen
@@ -552,12 +686,26 @@ public class FirebaseManager : MonoBehaviour
     }
 
 
-    public bool isAnonimo()
+    public bool IsAnonimo()
     {
         if(auth.CurrentUser.IsAnonymous)
         {
+            
             return true;         
         }
         return false;
     }
+
+    public string UserName()
+    {
+        if (user.DisplayName != "")
+        {
+            return user.DisplayName;
+        }
+        else
+        {
+            return "Guest";
+        }
+    }
+
 }

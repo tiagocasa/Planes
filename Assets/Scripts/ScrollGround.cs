@@ -9,7 +9,7 @@ public class ScrollGround : MonoBehaviour
 
     private BoxCollider2D groundCollider;
     private float groundHorizontalLength;
-
+    public ScrollGround1 sg1;
 
 
     [SerializeField] private Sprite[] spriteList;
@@ -55,9 +55,11 @@ public class ScrollGround : MonoBehaviour
 
     private void RepositionBackground()
     {
-        Vector2 groundOffset = new Vector2(groundHorizontalLength * 2f, 0);
-        transform.position = (Vector2)transform.position + groundOffset;
-
+        //Vector2 groundOffset = new Vector2(groundHorizontalLength * 2f, 0);
+        //transform.position = (Vector2)transform.position + groundOffset;
+        float groundOffset = sg1.gameObject.transform.localPosition.x;
+        Vector2 position = new Vector2(groundHorizontalLength + groundOffset, 0.2f);
+        transform.position = position;
 
         spriteRenderer.sprite = spriteList[GameControl.instance.groundIndex];
 

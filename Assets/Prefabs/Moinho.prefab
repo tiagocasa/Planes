@@ -98,8 +98,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colunaInferiorMax: -1
   colunaInferiorMin: -5.5
-  GapMax: 8
-  GapMin: 9
+  GapMax: 9
+  GapMin: 8
   velocity: 0
 --- !u!114 &4361107357431363422
 MonoBehaviour:

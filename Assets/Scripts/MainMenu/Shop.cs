@@ -103,11 +103,11 @@ public class Shop : MonoBehaviour
         //Verifica se ja tem a skin comprada
         if (PlayerPrefs.GetInt(nomeSkin)==1) {
             if (PlayerPrefs.GetInt("SkinSelecionada") == itemIndex) {
-                FindObjectOfType<AudioManagerMenu>().Play("voltar");
+                FindObjectOfType<AudioManager>().Play("voltar");
             } else {
                 
                 PlayerPrefs.SetInt("SkinSelecionada", itemIndex);
-                FindObjectOfType<AudioManagerMenu>().Play("botao");
+                FindObjectOfType<AudioManager>().Play("botao");
                 if (PlayerPrefs.GetInt("SkinSelecionada") == 5)
                 {
                     SkinSelec.GetComponent<Image>().sprite = SkinM1;
@@ -149,7 +149,7 @@ public class Shop : MonoBehaviour
                         ShopScrollView.GetChild(itemIndex).GetChild(3).GetComponent<Text>().text = "DEVAGAR E SEMPRE";
                     }
 
-                    FindObjectOfType<AudioManagerMenu>().Play("botao");
+                    FindObjectOfType<AudioManager>().Play("botao");
                     PlayerPrefs.SetInt(nomeSkin, 1);
                     coinsshop -= ShopItemsList[itemIndex].Price;
                     PlayerPrefs.SetInt("Coins", coinsshop);
@@ -158,12 +158,12 @@ public class Shop : MonoBehaviour
                 else
                 {
                     SemHC.SetTrigger("SemHC");
-                    FindObjectOfType<AudioManagerMenu>().Play("voltar");
+                    FindObjectOfType<AudioManager>().Play("voltar");
                 }
                
             } else {
                 SemMoeda.SetTrigger("SemMoeda");
-                FindObjectOfType<AudioManagerMenu>().Play("voltar");
+                FindObjectOfType<AudioManager>().Play("voltar");
             }
         }
     }

@@ -49,10 +49,7 @@ public class Column : MonoBehaviour, IPooledObject
 
 private void OnTriggerEnter2D (Collider2D other)
     {
-        if (GameControl.instance.isDash)
-        {
 
-        }
 
         if (other.gameObject.name == "Bird")
         {
@@ -61,5 +58,6 @@ private void OnTriggerEnter2D (Collider2D other)
 
 
     }
+
 
 }

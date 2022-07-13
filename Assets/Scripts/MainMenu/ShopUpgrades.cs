@@ -91,10 +91,10 @@ public class ShopUpgrades : MonoBehaviour
     //    //Verifica se ja tem a skin comprada
     //    if (PlayerPrefs.GetInt(nomeSkin)==1) {
     //        if (PlayerPrefs.GetInt("SkinSelecionada") == itemIndex) {
-    //            FindObjectOfType<AudioManagerMenu>().Play("voltar");
+    //            FindObjectOfType<AudioManager>().Play("voltar");
     //        } else {
     //            PlayerPrefs.SetInt("SkinSelecionada", itemIndex);
-    //            FindObjectOfType<AudioManagerMenu>().Play("botao");
+    //            FindObjectOfType<AudioManager>().Play("botao");
     //            SkinSelec.GetComponent<Image>().color = ShopItemsList[itemIndex].NewColor;
     //            PlayerPrefs.SetFloat("SkinSelecionadaRed", ShopItemsList[itemIndex].NewColor.r);
     //            PlayerPrefs.SetFloat("SkinSelecionadaBlue", ShopItemsList[itemIndex].NewColor.b);
@@ -110,7 +110,7 @@ public class ShopUpgrades : MonoBehaviour
     //                //buyBtn.interactable = false;
     //                ShopScrollView.GetChild(itemIndex).GetChild(1).gameObject.SetActive(false);
     //                ShopScrollView.GetChild(itemIndex).GetChild(4).gameObject.SetActive(true);
-    //                FindObjectOfType<AudioManagerMenu>().Play("botao");
+    //                FindObjectOfType<AudioManager>().Play("botao");
     //                PlayerPrefs.SetInt(nomeSkin, 1);
     //                coinsshop -= ShopItemsList[itemIndex].Price;
     //                PlayerPrefs.SetInt("Coins", coinsshop);
@@ -119,12 +119,12 @@ public class ShopUpgrades : MonoBehaviour
     //            else
     //            {
     //                SemHC.SetTrigger("SemHC");
-    //                FindObjectOfType<AudioManagerMenu>().Play("voltar");
+    //                FindObjectOfType<AudioManager>().Play("voltar");
     //            }
                
     //        } else {
     //            SemMoeda.SetTrigger("SemMoeda");
-    //            FindObjectOfType<AudioManagerMenu>().Play("voltar");
+    //            FindObjectOfType<AudioManager>().Play("voltar");
     //        }
     //    }
     //}

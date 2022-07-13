@@ -1,8 +1,8 @@
 {
   "project_info": {
     "project_number": "600617437529",
+    "firebase_url": "https://endless-escape-32d9f-default-rtdb.firebaseio.com",
     "project_id": "endless-escape-32d9f",
-    "firebase_url":"https://endless-escape-32d9f-default-rtdb.firebaseio.com/",
     "storage_bucket": "endless-escape-32d9f.appspot.com"
   },
   "client": [

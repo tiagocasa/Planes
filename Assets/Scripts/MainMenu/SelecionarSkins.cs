@@ -32,7 +32,7 @@ public class SelecionarSkins : MonoBehaviour
     {
         // Seta o menu principal pra desativo e ativa menu option
 
-        FindObjectOfType<AudioManagerMenu>().Play("botao");
+        FindObjectOfType<AudioManager>().Play("botao");
         PlayerPrefs.SetInt("SkinSelecionada", 1);
         skin1.text = "ATIVADO";
         skin2.text = "ATIVAR";
@@ -44,7 +44,7 @@ public class SelecionarSkins : MonoBehaviour
 
     public void Skin2()
     {
-        FindObjectOfType<AudioManagerMenu>().Play("botao");
+        FindObjectOfType<AudioManager>().Play("botao");
         PlayerPrefs.SetInt("SkinSelecionada", 2);
         skin1.text = "ATIVAR";
         skin2.text = "ATIVADO";
