@@ -21,6 +21,7 @@ public class ShopUpgrades : MonoBehaviour
     [SerializeField] List<ShopItem> ShopItemsList;
     [SerializeField] Animator SemMoeda;
     [SerializeField] Animator SemHC;
+ 
 
     public Text coinText;
     public Text highScore;

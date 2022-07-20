@@ -30,7 +30,7 @@ public class GameControl : MonoBehaviour
 
 
     public Text scoreText;
-    public Text highScore;
+    public GameObject highScore;
 
     private int score = 0;
 
@@ -67,6 +67,9 @@ public class GameControl : MonoBehaviour
     private float TempoIma;
     private float TempoDash;
 
+    public float turboFuel;
+    public Slider turboSlider;
+
     public int TotalCoins { get => totalCoins; set => totalCoins = value; }
 
     // Start is called before the first frame update
@@ -92,6 +95,8 @@ public class GameControl : MonoBehaviour
        
         TempoDash = MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo];
         TempoIma = MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet];
+        turboFuel = MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo];
+        turboSlider.value = turboFuel;
 
     }
 
@@ -105,13 +110,22 @@ public class GameControl : MonoBehaviour
             if (!isDash)
             {
                 gasoline -= Time.deltaTime;
+
+
+                if (turboFuel < TempoDash)
+                {
+                    turboFuel += Time.deltaTime*10;
+                    turboSlider.value = turboFuel;
+                }
             }
             else
             {
-                //gasoline -= (Time.deltaTime*5);
+                turboFuel -= Time.deltaTime;
+
             }
            
             gasolineSlider.value = gasoline;
+            turboSlider.value = turboFuel;
         }
 
         if (isDash)
@@ -144,7 +158,7 @@ public class GameControl : MonoBehaviour
         }
 
 
-        scrollSpeed -= (Time.deltaTime * 0.01f);
+        scrollSpeed -= (Time.deltaTime * 0.02f);
 
         if (isDash && !gameOver && timedash > TempoDash)
         {
@@ -152,6 +166,8 @@ public class GameControl : MonoBehaviour
             isDash = false;
             timedash = 0;
             scrollSpeed= tempSpeed;
+            gasolineSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 255);
+            turboSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 100);
         }
 
         if (isIma && !gameOver && timeIma > TempoIma)
@@ -182,7 +198,7 @@ public class GameControl : MonoBehaviour
         if (score > MenuManager.instance.Highscore)
         {
             MenuManager.instance.SetHighscore(score.ToString());
-            highScore.text = "HIGHSCORE:" + score.ToString();
+            highScore.SetActive(true);
         }
 
         manager.SaveDataButton();
@@ -233,6 +249,8 @@ public class GameControl : MonoBehaviour
         {
             scrollSpeed *= 5;
             isDash = true;
+            gasolineSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 100);
+            turboSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 255);
         }
 
 

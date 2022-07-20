@@ -10,12 +10,17 @@ public class CheckIntenet : MonoBehaviour
 {
     [SerializeField] TMP_Text Loading;
     [SerializeField] TMP_Text tryAgain;
+    [SerializeField] TMP_Text title;
     [SerializeField] Button tryAgainBtn;
     [SerializeField] GameObject tela;
     [SerializeField] GameObject loadinAnim;
 
     // Start is called before the first frame update
     void Start()
+    {
+        StartCoroutine(CheckInternetConnection());
+    }
+    private void OnEnable()
     {
         StartCoroutine(CheckInternetConnection());
     }
@@ -39,7 +44,6 @@ public class CheckIntenet : MonoBehaviour
         else
         {
             tela.SetActive(false);
-            FindObjectOfType<NewMenu>().ScreenUpdate();
             InvokeRepeating(nameof(Check), 5.0f, 5.0f);
         }
 
@@ -62,7 +66,9 @@ public class CheckIntenet : MonoBehaviour
         {
             CancelInvoke();
             tela.SetActive(true);
+            title.text = "Error";
             Loading.gameObject.SetActive(false);
+            loadinAnim.SetActive(false);
             tryAgain.gameObject.SetActive(true);
             tryAgainBtn.gameObject.SetActive(true);
         }

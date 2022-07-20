@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class NewMenu : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class NewMenu : MonoBehaviour
     [SerializeField] private TMP_Text coinText;
     [SerializeField] private TMP_Text cashText;
     [SerializeField] private TMP_Text nameText;
+    [SerializeField] private GameObject avatar;
 
     // Start is called before the first frame update
     void Start()
@@ -18,10 +20,14 @@ public class NewMenu : MonoBehaviour
         fm = FindObjectOfType<FirebaseManager>();
     }
 
+    private void OnEnable()
+    {
+        ScreenUpdate();
+    }
     // Update is called once per frame
     void Update()
     {
-      //  if (SceneManager.GetActiveScene().buildIndex == 0) {ScreenUpdate(); }
+       //if (SceneManager.GetActiveScene().buildIndex == 0) {ScreenUpdate(); }
     }
     public void ScreenUpdate()
     {
@@ -29,5 +35,21 @@ public class NewMenu : MonoBehaviour
         coinText.text = MenuManager.instance.TotalCoins.ToString();
         cashText.text = MenuManager.instance.Cash.ToString();
         nameText.text = fm.UserName();
+        if (nameText.text != "Guest")
+        {
+            avatar.SetActive(true);
+            avatar.GetComponent<Image>().sprite = FindObjectOfType<AvatarList>().spriteList[MenuManager.instance.AvatarId];
+        }
+        else
+        {
+            avatar.SetActive(false);
+        }
+
+
+    }
+
+    public void SignOut()
+    {
+        FindObjectOfType<FirebaseManager>().SignOutButton();
     }
 }

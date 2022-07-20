@@ -20,9 +20,11 @@ public class ShopUp : MonoBehaviour
     private string novaDescricao;
     private string preco;
     private int nivel;
+    private int index;
 
     private FirebaseManager fm;
 
+    [SerializeField] GameObject loading;
 
     [SerializeField] List<ShopItem> ShopItemsList;
     [SerializeField] Animator SemMoeda;
@@ -77,7 +79,7 @@ public class ShopUp : MonoBehaviour
                     nivel = MenuManager.instance.LevelCoin;
                     buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
                     buyBtn.interactable = true;
-                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                    buyBtn.AddEventListener(i, LoadAndSave);
                 }
                 shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.ChanceCoin[MenuManager.instance.LevelCoin]}%"; // mudar pro valor
             }
@@ -99,7 +101,7 @@ public class ShopUp : MonoBehaviour
                     nivel = MenuManager.instance.LevelGas;
                     buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
                     buyBtn.interactable = true;
-                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                    buyBtn.AddEventListener(i, LoadAndSave);
                 }
                 shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas]}%"; // mudar pro valor
 
@@ -122,7 +124,7 @@ public class ShopUp : MonoBehaviour
                     nivel = MenuManager.instance.LevelMagnet;
                     buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
                     buyBtn.interactable = true;
-                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                    buyBtn.AddEventListener(i, LoadAndSave);
                 }
                 shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.DurationMagnet[MenuManager.instance.LevelMagnet]} sec"; // mudar pro valor
             }
@@ -144,7 +146,7 @@ public class ShopUp : MonoBehaviour
                     nivel = MenuManager.instance.LevelTurbo;
                     buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
                     buyBtn.interactable = true;
-                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                    buyBtn.AddEventListener(i, LoadAndSave);
                 }
                 shopContainer.transform.GetChild(0).GetChild(2).GetComponent<TMP_Text>().text = $"{MenuManager.instance.DurationTurbo[MenuManager.instance.LevelTurbo]} sec"; // mudar pro valor
             }
@@ -163,19 +165,27 @@ public class ShopUp : MonoBehaviour
         Destroy(ItemTemplate);
     }
 
-    void OnShopItemBtnClicked(int itemIndex)
+    public void LoadAndSave(int i)
+    {
+        loading.SetActive(true);
+        index = i;
+        StartCoroutine(fm.LoadUserData(OnShopItemBtnClicked));
+        
+    }
+
+    void OnShopItemBtnClicked()
     {
         int coinsshop = MenuManager.instance.TotalCoins;
-        int high = MenuManager.instance.Highscore;
-        string nomeSkin = ShopItemsList[itemIndex].Nome;
+        string nomeSkin = ShopItemsList[index].Nome;
 
         Debug.Log(PlayerPrefs.GetInt(nomeSkin));
 
+   
         //Verifica se tem moeda
-        shopContainer = ShopScrollView.GetChild(itemIndex).gameObject;
+        shopContainer = ShopScrollView.GetChild(index).gameObject;
         buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
 
-        if (itemIndex == 0)
+        if (index == 0)
         {
             int precoLocal = coinChancePrice[MenuManager.instance.LevelCoin];
 
@@ -216,7 +226,7 @@ public class ShopUp : MonoBehaviour
                 FindObjectOfType<AudioManager>().Play("voltar");
             }
         }
-        else if (itemIndex == 1)
+        else if (index == 1)
         {
             int precoLocal = gasPrice[MenuManager.instance.LevelGas];
             if (coinsshop >= precoLocal)
@@ -253,7 +263,7 @@ public class ShopUp : MonoBehaviour
                 FindObjectOfType<AudioManager>().Play("voltar");
             }
         }
-        else if(itemIndex == 2)
+        else if(index == 2)
         {
             int precoLocal = magnetPrice[MenuManager.instance.LevelMagnet];
             if (coinsshop >= precoLocal)
@@ -290,7 +300,7 @@ public class ShopUp : MonoBehaviour
                 FindObjectOfType<AudioManager>().Play("voltar");
             }
         }
-        else if(itemIndex == 3)
+        else if(index == 3)
         {
             int precoLocal = turboPrice[MenuManager.instance.LevelTurbo];
             if (coinsshop >= precoLocal)
@@ -330,8 +340,8 @@ public class ShopUp : MonoBehaviour
 
         cashText.text = MenuManager.instance.Cash.ToString();
         coinText.text = MenuManager.instance.TotalCoins.ToString();
-
-
+        fm.SaveDataButton();
+        loading.SetActive(false);
 
         ////Update Coins
         //PlayerPrefs.SetInt("Coins", coinsshop);

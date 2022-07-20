@@ -48,7 +48,8 @@ public class PlayerStatus
 
     public PlayerStatus Initialize()
     {
-        username = "Guest";
+        Username = "Guest";
+        AvatarId = 0;
         Highscore = 0;
         Coins = 0;
         Cash = 0;

@@ -21,8 +21,14 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private TMP_Text cashText;
     [SerializeField] private TMP_Text coinText;
 
+    public string btn1;
+    public string btn2;
+    public string btn3;
+    public string btn4;
 
-    private string username;
+
+   public string username;
+    private int avatarId;
     public int totalCoins;
     private int highscore;
     private int cash;
@@ -31,16 +37,12 @@ public class MenuManager : MonoBehaviour
     private int levelMagnet;
     private int levelTurbo;
 
-    private int[] chanceCoin = { 10, 20, 30, 50, 80 };
+    private int[] chanceCoin = { 20, 35,50, 70, 90 };
     private int[] quantityGas = { 15, 25, 50, 75, 100 };
-    private int[] durationMagnet = { 10, 15, 20, 25, 30 };
-    private int[] durationTurbo = { 5, 8, 10, 13, 15 };
+    private int[] durationMagnet = { 20, 25, 30, 40, 50 };
+    private int[] durationTurbo = { 5, 8, 10, 15, 20 };
 
     private string skinNameSelected;
-    private bool hasSkin0;
-    private bool hasSkin1;
-    private bool hasSkin2;
-    private bool hasSkin3;
     private Sprite skinSprite;
 
     public List<int> playerSkins = new List<int>();
@@ -53,10 +55,6 @@ public class MenuManager : MonoBehaviour
     public int LevelGas { get => levelGas; set => levelGas = value; }
     public int LevelMagnet { get => levelMagnet; set => levelMagnet = value; }
     public int LevelTurbo { get => levelTurbo; set => levelTurbo = value; }
-    public bool HasSkin0 { get => hasSkin0; set => hasSkin0 = value; }
-    public bool HasSkin1 { get => hasSkin1; set => hasSkin1 = value; }
-    public bool HasSkin2 { get => hasSkin2; set => hasSkin2 = value; }
-    public bool HasSkin3 { get => hasSkin3; set => hasSkin3 = value; }
     public int[] ChanceCoin { get => chanceCoin; set => chanceCoin = value; }
     public int[] QuantityGas { get => quantityGas; set => quantityGas = value; }
     public int[] DurationMagnet { get => durationMagnet; set => durationMagnet = value; }
@@ -64,6 +62,7 @@ public class MenuManager : MonoBehaviour
     public string SkinNameSelected { get => skinNameSelected; set => skinNameSelected = value; }
     public Sprite SkinSprite { get => skinSprite; set => skinSprite = value; }
     public List<int> PlayerSkins { get => playerSkins; set => playerSkins = value; }
+    public int AvatarId { get => avatarId; set => avatarId = value; }
 
 
 
@@ -102,6 +101,7 @@ public class MenuManager : MonoBehaviour
         Cash = 0;
         PlayerSkins[0] = 0;
         SkinNameSelected = "Default";
+        Username = "Guest";
     }
 
     public void SetHighscore(string _score)
@@ -144,33 +144,10 @@ public class MenuManager : MonoBehaviour
     {
         SkinNameSelected = _skinName;
     }
-    public void SetSkin0(string _hasSkin)
+
+    public void SetAvatarId(string _avatarId)
     {
-        if (_hasSkin == "True")
-        {
-            hasSkin0 = true;
-        }
-    }
-    public void SetSkin1(string _hasSkin)
-    {
-        if (_hasSkin == "True")
-        {
-            hasSkin1 = true;
-        }
-    }
-    public void SetSkin2(string _hasSkin)
-    {
-        if (_hasSkin == "True")
-        {
-            hasSkin2 = true;
-        }
-    }
-    public void SetSkin3(string _hasSkin)
-    {
-        if (_hasSkin == "True")
-        {
-            hasSkin3 = true;
-        }
+        AvatarId = int.Parse(_avatarId);
     }
 
     public void UpdateSkinList(DataSnapshot snapshot)

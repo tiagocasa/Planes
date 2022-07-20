@@ -35,7 +35,7 @@ public class bird : MonoBehaviour
         spriteHeli.sprite = skinSprite;
         Debug.Log(spriteHeli.sprite);
         Helice.SetActive(true);
-
+        FindObjectOfType<AudioManager>().Play("Helicoptero");
     }
      public void ChangeSking()
     {
@@ -129,7 +129,7 @@ public class bird : MonoBehaviour
 
         }
     }
-
+    
     private void LateUpdate()
     {
         if (!GameControl.instance.gameOver)

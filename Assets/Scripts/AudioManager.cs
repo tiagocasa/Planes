@@ -4,7 +4,10 @@ using System;
 
 public class AudioManager : MonoBehaviour
 {
+    public static AudioManager instance;
+
     public Sound[] sounds;
+
     private float volumeGeral;
     public AudioMixer musicMixer;
     public AudioMixer sfxMixer;
@@ -13,17 +16,17 @@ public class AudioManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        if (!once_call)
+        if (instance == null)
         {
+            instance = this;
             DontDestroyOnLoad(this);
-            once_call = true;
         }
-        else
+        else if (instance != this)
         {
-
             Destroy(gameObject);
-
         }
+
+
         foreach (Sound s in sounds)
         {
             s.source = gameObject.AddComponent<AudioSource>();

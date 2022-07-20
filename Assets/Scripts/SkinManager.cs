@@ -27,6 +27,11 @@ public class SkinManager : MonoBehaviour
   
 
     [SerializeField] List<Skins> SkinList;
+    [SerializeField] GameObject loading;
+
+    [SerializeField] Sprite skindefault;
+
+    [SerializeField] Sprite skindefaultRank;
 
     private FirebaseManager fm;
     [SerializeField] Animator SemMoeda;
@@ -38,6 +43,7 @@ public class SkinManager : MonoBehaviour
     [SerializeField] private TMP_Text coinText;
 
     Button buyBtn;
+    private int index;
 
     private void Start()
     {
@@ -112,7 +118,7 @@ public class SkinManager : MonoBehaviour
                     }
 
                     buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
-                    buyBtn.AddEventListener(i, OnShopItemBtnClicked);
+                    buyBtn.AddEventListener(i, LoadAndSave);
                 }
             }
 
@@ -120,26 +126,41 @@ public class SkinManager : MonoBehaviour
         }
     }
 
+    public void LoadAndSave(int i)
+    {
+        loading.SetActive(true);
+        index = i;
+        StartCoroutine(fm.LoadUserData(OnShopItemBtnClicked));
 
-    void OnShopItemBtnClicked(int itemIndex)
+    }
+    void OnShopItemBtnClicked()
     {
         int coinsshop = MenuManager.instance.TotalCoins;
         int cash = MenuManager.instance.Cash;
-        string nomeSkin = SkinList[itemIndex].Nome;
+        string nomeSkin = SkinList[index].Nome;
 
         Debug.Log(PlayerPrefs.GetInt(nomeSkin));
 
-        shopContainer = ShopScrollView.GetChild(itemIndex).gameObject;
+        shopContainer = ShopScrollView.GetChild(index).gameObject;
         buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
         
         int len = SkinList.Count;
         for (int i = 0; i < len; i++)
         {
-            if (i == itemIndex)
+            if (i == index)
             {
                 int precoLocal = SkinList[i].price;
                 if ((SkinList[i].currency == Currency.Cash && cash > precoLocal) || (SkinList[i].currency == Currency.Coin && coinsshop > precoLocal))
                 {
+                    if (SkinList[i].currency == Currency.Cash)
+                    {
+                        MenuManager.instance.Cash -= precoLocal;
+                    }
+                    else
+                    {
+                        MenuManager.instance.TotalCoins -= precoLocal;
+                    }
+                    FindObjectOfType<AudioManager>().Play("botao");
                     shopContainer.transform.GetChild(2).gameObject.SetActive(false);
                     shopContainer.transform.GetChild(3).gameObject.SetActive(true);
                     shopContainer.transform.GetChild(3).GetChild(0).gameObject.SetActive(true);
@@ -149,22 +170,30 @@ public class SkinManager : MonoBehaviour
                     buyBtn.AddEventListener(i, OnSkinPurchasedBtnClicked);
                     StartCoroutine(fm.UpdateSkinList(i));
                 }
+                else
+                {
+                    SemMoeda.SetTrigger("SemMoeda");
+                    FindObjectOfType<AudioManager>().Play("voltar");
+                }
 
 
             }
         }
-        
-        
+
+        fm.SaveDataButton();
+        FindObjectOfType<NewMenu>().ScreenUpdate();
+        loading.SetActive(false);
+
     }
 
-    void OnSkinPurchasedBtnClicked(int itemIndex)
+    void OnSkinPurchasedBtnClicked(int index)
     {
         int len = SkinList.Count;
         for (int i = 0; i < len; i++)
         {
             GameObject shop = ShopScrollView.transform.GetChild(i).gameObject;
             buyBtn = shop.transform.GetChild(3).GetComponent<Button>();
-            if (i == itemIndex)
+            if (i == index)
             {
                 shop.transform.GetChild(2).gameObject.SetActive(false);
                 shop.transform.GetChild(3).gameObject.SetActive(true);
@@ -204,6 +233,25 @@ public class SkinManager : MonoBehaviour
             }
         }
         Debug.Log("skin null");
-        return null;
+        return skindefault;
+    }
+
+    public Sprite GetSkinRank(string _skinName)
+    {
+        Debug.Log("1");
+        int len = SkinList.Count;
+
+        for (int i = 0; i < len; i++)
+        {
+            if (SkinList[i].Nome == _skinName)
+            {
+                Debug.Log(SkinList[i].GameSprite);
+
+                return SkinList[i].Image;
+
+            }
+        }
+        Debug.Log("skin null");
+        return skindefaultRank;
     }
 }

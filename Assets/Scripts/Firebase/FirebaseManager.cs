@@ -19,35 +19,7 @@ public class FirebaseManager : MonoBehaviour
     public FirebaseUser user;
     public DatabaseReference DBreference;
 
-    //Login variables
-    [Header("Login")]
-    public TMP_InputField emailLoginField;
-    public TMP_InputField passwordLoginField;
-    public TMP_Text warningLoginText;
-    public TMP_Text confirmLoginText;
 
-    //Register variables
-    [Header("Register")]
-    public TMP_InputField usernameRegisterField;
-    public TMP_InputField emailRegisterField;
-    public TMP_InputField passwordRegisterField;
-    public TMP_InputField passwordRegisterVerifyField;
-    public TMP_Text warningRegisterText;
-
-    //User Data variables
-    [Header("UserData")]
-    public TMP_Text username    ;
-
-    [Header("LoadinScreen")]
-    public GameObject loadingScreen;
-    public TMP_Text loadingText;
-    public TMP_Text errorText;
-    
-    public Button retryBtn;
-
-    GameObject ItemTemplate;
-    [SerializeField] GameObject RankingContent;
-    [SerializeField] Transform RankScrollView;
     static public bool once_call;
 
   
@@ -187,41 +159,30 @@ public class FirebaseManager : MonoBehaviour
 
     public void ClearLoginFeilds()
     {
-        emailLoginField.text = "";
-        passwordLoginField.text = "";
+       FindObjectOfType<Login>().ClearLoginFields();
     }
     public void ClearRegisterFeilds()
     {
-        usernameRegisterField.text = "";
-        emailRegisterField.text = "";
-        passwordRegisterField.text = "";
-        passwordRegisterVerifyField.text = "";
+        FindObjectOfType<Signup>().ClearRegisterFields();
     }
 
     //Function for the login button
-    public void LoginButton()
+    public void LoginButton(string _email, string _password)
     {
         //Call the login coroutine passing the email and password
-        StartCoroutine(Login(emailLoginField.text, passwordLoginField.text));
+        StartCoroutine(Login(_email, _password));
     }
     //Function for the register button
-    public void RegisterButton()
+    public void RegisterButton(string _email, string _password, string _confirmpass, string _username)
     {
         //Call the register coroutine passing the email, password, and username
-        StartCoroutine(Register(emailRegisterField.text, passwordRegisterField.text, usernameRegisterField.text));
+        StartCoroutine(Register(_email, _password, _confirmpass, _username));
     }
     //Function for the sign out button
     public void SignOutButton()
     {
         auth.SignOut();
-        MenuManager.instance.SettingsScreen.SetActive(false);
-
-        //Criar usuario anonimo:
-        StartAnonimous();
-
-
-        ClearRegisterFeilds();
-        ClearLoginFeilds();
+        Application.Quit();
     }
     //Function for the save button
     public void SaveDataButton()
@@ -232,18 +193,15 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(UpdateGasLevel(MenuManager.instance.LevelGas));
         StartCoroutine(UpdateMagnetLevel(MenuManager.instance.LevelMagnet));
         StartCoroutine(UpdateDashLevel(MenuManager.instance.LevelTurbo));
+        StartCoroutine(UpdateHighscore(MenuManager.instance.Highscore));
+        StartCoroutine(UpdateAvatarId(MenuManager.instance.AvatarId));
         if (SceneManager.GetActiveScene().buildIndex == 0)
         {
             FindObjectOfType<NewMenu>().ScreenUpdate();
         }
     }
     //Function for the scoreboard button
-    public void ScoreboardButton()
-    {
-        StartCoroutine(LoadScoreboardData());
-    }
-
-    private IEnumerator Login(string _email, string _password)
+     private IEnumerator Login(string _email, string _password)
     {
         //Call the Firebase auth signin function passing the email and password
         var LoginTask = auth.SignInWithEmailAndPasswordAsync(_email, _password);
@@ -276,7 +234,8 @@ public class FirebaseManager : MonoBehaviour
                     message = "Account does not exist";
                     break;
             }
-            warningLoginText.text = message;
+            FindObjectOfType<Login>().Warning(message);
+            
         }
         else
         {
@@ -284,33 +243,33 @@ public class FirebaseManager : MonoBehaviour
             //Now get the result
             user = LoginTask.Result;
             Debug.LogFormat("User signed in successfully: {0} ({1})", user.DisplayName, user.Email);
-            warningLoginText.text = "";
-            confirmLoginText.text = "Logged In";
+            FindObjectOfType<Login>().Warning("");
+            FindObjectOfType<Login>().Confirmation("Logged In");
 
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(3);
 
-            username.text = user.DisplayName;
-           
-            
-            confirmLoginText.text = "";
+            MenuManager.instance.Username = user.DisplayName;
+
+
+            FindObjectOfType<Login>().Confirmation("");
             ClearLoginFeilds();
-            ClearRegisterFeilds();
+            
             StartCoroutine(LoadUserData(ScreenUp));
 
         }
     }
 
-    private IEnumerator Register(string _email, string _password, string _username)
+    private IEnumerator Register(string _email, string _password, string _confirmpass, string _username)
     {
         if (_username == "")
         {
             //If the username field is blank show a warning
-            warningRegisterText.text = "Missing Username";
+            FindObjectOfType<Signup>().Warning("Missing Username");
         }
-        else if (passwordRegisterField.text != passwordRegisterVerifyField.text)
+        else if (_password != _confirmpass)
         {
             //If the password does not match show a warning
-            warningRegisterText.text = "Password Does Not Match!";
+            FindObjectOfType<Signup>().Warning("Password Does Not Match!");
         }
         else
         {
@@ -344,7 +303,8 @@ public class FirebaseManager : MonoBehaviour
                         message = "Email Already In Use";
                         break;
                 }
-                warningRegisterText.text = message;
+                FindObjectOfType<Signup>().Warning(message);
+                
             }
             else
             {
@@ -366,14 +326,18 @@ public class FirebaseManager : MonoBehaviour
                     {
                         //If there are errors handle them
                         Debug.LogWarning(message: $"Failed to register task with {ProfileTask.Exception}");
-                        warningRegisterText.text = "Username Set Failed!";
+                        FindObjectOfType<Signup>().Warning("Username Set Failed!");
+                        
                     }
                     else
                     {
+
                         //Username is now set
-                        warningRegisterText.text = "";
+
+                        FindObjectOfType<Signup>().Warning("Registerd. Loggin in...");
+                        yield return new WaitForSeconds(3);
                         ClearRegisterFeilds();
-                        ClearLoginFeilds();
+                        
                         StartCoroutine(LoadUserData(ScreenUp));
                         //FirebaseDatabase.DefaultInstance.GetReference("Player Status").Child(user.UserId).SetRawJsonValueAsync(JsonConvert.SerializeObject(new PlayerStatus().Initialize()));
                     }
@@ -446,7 +410,38 @@ public class FirebaseManager : MonoBehaviour
             //Database username is now updated
         }
     }
+    public IEnumerator UpdateHighscore(int _highscore)
+    {
+        //Set the currently logged in user username in the database
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("Highscore").SetValueAsync(_highscore);
 
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Database username is now updated
+        }
+    }
+    public IEnumerator UpdateAvatarId(int _avatarId)
+    {
+        //Set the currently logged in user username in the database
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("AvatarId").SetValueAsync(_avatarId);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Database username is now updated
+        }
+    }
     private IEnumerator UpdateCash(int _cash)
     {
         //Set the currently logged in user xp
@@ -582,9 +577,10 @@ public class FirebaseManager : MonoBehaviour
             MenuManager.instance.SetMagnetLevel(snapshot.Child("MagnetUpgrade").Value.ToString());
             MenuManager.instance.SetTurboLevel(snapshot.Child("DashUpgrade").Value.ToString());
             MenuManager.instance.SetSkinName(snapshot.Child("SkinNameSelected").Value.ToString());
+            MenuManager.instance.SetAvatarId(snapshot.Child("AvatarId").Value.ToString());
             MenuManager.instance.UpdateSkinList(snapshot.Child("PlayerSkins")) ;
 
-            FindObjectOfType<NewMenu>().ScreenUpdate();
+            //FindObjectOfType<NewMenu>().ScreenUpdate();
 
             if (callback != null)
             {
@@ -593,8 +589,34 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    public void SendPasswordResetEmail(string _emailAdress)
+    {
+        string emailAddress = _emailAdress;
+        if (user != null)
+        {
+            auth.SendPasswordResetEmailAsync(emailAddress).ContinueWith(task => {
+                if (task.IsCanceled)
+                {
+                   // FindObjectOfType<Signup>().Warning("Canceled");
+                    Debug.LogError("SendPasswordResetEmailAsync was canceled.");
+                    
+                    return;
+                }
+                if (task.IsFaulted)
+                {
+                    //FindObjectOfType<Signup>().Warning("Email not found");
+                    Debug.LogError("SendPasswordResetEmailAsync encountered an error: " + task.Exception);
+                    return;
+                }
+
+                FindObjectOfType<Signup>().Warning("Reset email sent");
+                Debug.Log("Password reset email sent successfully.");
+                return;
+            });
+        }
+    }
   
-    public IEnumerator LoadScoreboardData()
+    public IEnumerator LoadScoreboardData(GameObject _content, Transform _scrollView)
     {
         //Get all the Player Status data ordered by kills amount
         var DBTask = DBreference.Child("Player Status").OrderByChild("Highscore").GetValueAsync();
@@ -609,10 +631,10 @@ public class FirebaseManager : MonoBehaviour
         {
             //Data has been retrieved
             DataSnapshot snapshot = DBTask.Result;
-
-            ItemTemplate = RankingContent;
+            GameObject ItemTemplate;
+            ItemTemplate = _content;
             //Destroy any existing scoreboard elements
-            foreach (Transform child in RankScrollView.transform)
+            foreach (Transform child in _scrollView.transform)
             {
                 Destroy(child.gameObject);
             }
@@ -622,75 +644,76 @@ public class FirebaseManager : MonoBehaviour
             {
                 string username = childSnapshot.Child("Username").Value.ToString();
                 int highscore = int.Parse(childSnapshot.Child("Highscore").Value.ToString());
-                int avatarid = 1;//int.Parse(childSnapshot.Child("Avatarid").Value.ToString());
-               
+                int avatarid = int.Parse(childSnapshot.Child("AvatarId").Value.ToString());
+                string skinid = childSnapshot.Child("SkinNameSelected").Value.ToString();
 
                 //Instantiate new scoreboard elements
-                GameObject scoreboardElement = Instantiate(ItemTemplate, RankScrollView);
+                GameObject scoreboardElement = Instantiate(ItemTemplate, _scrollView);
                 //if (childSnapshot.First() == item)
                 //    item.firstStuff();
 
                 //else if (childSnapshot.Last() == item)
-                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(1,username, highscore,avatarid);
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(1,username, highscore,avatarid,skinid);
             }
 
             foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Skip(1).Take(1))
             {
                 string username = childSnapshot.Child("Username").Value.ToString();
                 int highscore = int.Parse(childSnapshot.Child("Highscore").Value.ToString());
-                int avatarid = 1;//int.Parse(childSnapshot.Child("Avatarid").Value.ToString());
-
+                int avatarid = int.Parse(childSnapshot.Child("AvatarId").Value.ToString());
+                string skinid = childSnapshot.Child("SkinNameSelected").Value.ToString();
 
                 //Instantiate new scoreboard elements
-                GameObject scoreboardElement = Instantiate(ItemTemplate, RankScrollView);
+                GameObject scoreboardElement = Instantiate(ItemTemplate, _scrollView);
                 //if (childSnapshot.First() == item)
                 //    item.firstStuff();
 
                 //else if (childSnapshot.Last() == item)
-                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(2, username, highscore, avatarid);
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(2, username, highscore, avatarid, skinid);
             }
             foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Skip(2).Take(1))
             {
                 string username = childSnapshot.Child("Username").Value.ToString();
                 int highscore = int.Parse(childSnapshot.Child("Highscore").Value.ToString());
-                int avatarid = 1;//int.Parse(childSnapshot.Child("Avatarid").Value.ToString());
-
+                int avatarid = int.Parse(childSnapshot.Child("AvatarId").Value.ToString());
+                string skinid = childSnapshot.Child("SkinNameSelected").Value.ToString();
 
                 //Instantiate new scoreboard elements
-                GameObject scoreboardElement = Instantiate(ItemTemplate, RankScrollView);
+                GameObject scoreboardElement = Instantiate(ItemTemplate, _scrollView);
                 //if (childSnapshot.First() == item)
                 //    item.firstStuff();
 
                 //else if (childSnapshot.Last() == item)
-                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(3, username, highscore, avatarid);
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(3, username, highscore, avatarid,skinid);
             }
             foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Skip(3).Take(17))
             {
                 string username = childSnapshot.Child("Username").Value.ToString();
                 int highscore = int.Parse(childSnapshot.Child("Highscore").Value.ToString());
-                int avatarid = 1;//int.Parse(childSnapshot.Child("Avatarid").Value.ToString());
-
+                int avatarid = int.Parse(childSnapshot.Child("AvatarId").Value.ToString());
+                string skinid = childSnapshot.Child("SkinNameSelected").Value.ToString();
 
                 //Instantiate new scoreboard elements
-                GameObject scoreboardElement = Instantiate(ItemTemplate, RankScrollView);
+                GameObject scoreboardElement = Instantiate(ItemTemplate, _scrollView);
                 //if (childSnapshot.First() == item)
                 //    item.firstStuff();
 
                 //else if (childSnapshot.Last() == item)
-                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(5, username, highscore, avatarid);
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(5, username, highscore, avatarid,skinid);
             }
 
             //Go to scoareboard screen
             //UIManager.instance.ScoreboardScreen();
         }
+
+        FindObjectOfType<NewMenu>().transform.GetChild(12).gameObject.SetActive(false);
     }
 
 
     public bool IsAnonimo()
     {
-        if(auth.CurrentUser.IsAnonymous)
+        if(MenuManager.instance.Username=="Guest")
         {
-            
             return true;         
         }
         return false;
@@ -708,4 +731,5 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    
 }
