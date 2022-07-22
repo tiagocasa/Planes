@@ -142,7 +142,7 @@ public class SkinManager : MonoBehaviour
         Debug.Log(PlayerPrefs.GetInt(nomeSkin));
 
         shopContainer = ShopScrollView.GetChild(index).gameObject;
-        buyBtn = shopContainer.transform.GetChild(2).GetComponent<Button>();
+        buyBtn = shopContainer.transform.GetChild(3).GetComponent<Button>();
         
         int len = SkinList.Count;
         for (int i = 0; i < len; i++)
@@ -150,7 +150,7 @@ public class SkinManager : MonoBehaviour
             if (i == index)
             {
                 int precoLocal = SkinList[i].price;
-                if ((SkinList[i].currency == Currency.Cash && cash > precoLocal) || (SkinList[i].currency == Currency.Coin && coinsshop > precoLocal))
+                if ((SkinList[i].currency == Currency.Cash && cash >= precoLocal) || (SkinList[i].currency == Currency.Coin && coinsshop >= precoLocal))
                 {
                     if (SkinList[i].currency == Currency.Cash)
                     {
@@ -203,7 +203,7 @@ public class SkinManager : MonoBehaviour
                 shop.transform.GetChild(3).GetChild(0).gameObject.SetActive(false);
                 shop.transform.GetChild(3).GetChild(1).gameObject.SetActive(true);
                 MenuManager.instance.SkinNameSelected = SkinList[i].Nome;
-                fm.UpdateSelectSkinName(SkinList[i].Nome);
+                StartCoroutine(fm.UpdateSelectSkinName(SkinList[i].Nome));
             }
             else
             {

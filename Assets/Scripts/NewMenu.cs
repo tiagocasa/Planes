@@ -34,7 +34,7 @@ public class NewMenu : MonoBehaviour
         highscoreText.text = MenuManager.instance.Highscore.ToString();
         coinText.text = MenuManager.instance.TotalCoins.ToString();
         cashText.text = MenuManager.instance.Cash.ToString();
-        nameText.text = fm.UserName();
+        nameText.text = MenuManager.instance.Username;
         if (nameText.text != "Guest")
         {
             avatar.SetActive(true);

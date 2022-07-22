@@ -6,13 +6,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class GameControl : MonoBehaviour
 {
     public static GameControl instance;
 
     private FirebaseManager manager;
-
+    public GameObject coinEffect;
 
 
     public GameObject gameOverText;
@@ -32,11 +33,11 @@ public class GameControl : MonoBehaviour
     public Text scoreText;
     public GameObject highScore;
 
-    private int score = 0;
+    public int score = 0;
 
 
 
-    private int coins = 0;
+    [SerializeField] private int coins = 0;
     private int totalCoins;
 
 
@@ -69,6 +70,9 @@ public class GameControl : MonoBehaviour
 
     public float turboFuel;
     public Slider turboSlider;
+
+    Coroutine _C2T;
+
 
     public int TotalCoins { get => totalCoins; set => totalCoins = value; }
 
@@ -177,30 +181,77 @@ public class GameControl : MonoBehaviour
         }
     }
 
+    IEnumerator CountTo(float targetValue, float currentValue)
+    {
+
+        coinEffect.SetActive(true);
+        var rate = Mathf.Abs(targetValue/2f);
+
+        coinGO.text = currentValue.ToString();
+        targetValue += currentValue;
+       
+        while (currentValue != targetValue)
+        {
+            currentValue = Mathf.MoveTowards(currentValue, targetValue, rate * Time.deltaTime);
+            coinGO.text = ((int)currentValue).ToString();
+            coinText.text = ((int)(targetValue - currentValue)).ToString();
+            FindObjectOfType<AudioManager>().Play("points");
+            yield return null;
+            
+        }
+        coinEffect.SetActive(false);
+    }
+
+    IEnumerator CountToHighscore(float targetValue)
+    {
+        var currentValue = 0f;
+        var hs = MenuManager.instance.Highscore;
+        var rate = Mathf.Abs(targetValue/ 2f);
+        bool hstrue = true;
+        highscoreGO.text = "0";
+        while (currentValue != targetValue)
+        {
+            currentValue = Mathf.MoveTowards(currentValue, targetValue, rate * Time.deltaTime);
+            highscoreGO.text = ((int)currentValue).ToString();
+            scoreText.text = ((int)(targetValue - currentValue)).ToString();
+            
+            if (currentValue > hs && hstrue)
+            {
+                FindObjectOfType<AudioManager>().Play("positive");
+                highScore.SetActive(true);
+                hstrue = false;
+            }
+            yield return null;
+        }
+
+    }
 
 
     public void BirdDied()
     {
         //fazer efeito https://www.youtube.com/watch?v=CfX002SPWmU&ab_channel=Unity3DSchool
-        MenuManager.instance.TotalCoins += coins;
-        coins = 0;
-        
+     
+        StartCoroutine(CountTo(coins, MenuManager.instance.TotalCoins));
+        StartCoroutine(CountToHighscore(score));
 
 
-        coinGO.text = MenuManager.instance.TotalCoins.ToString();
-        coinText.text = coins.ToString();
-        highscoreGO.text = score.ToString();
+
+
+        //coinGO.text = MenuManager.instance.TotalCoins.ToString();
+        ////coinText.text = coins.ToString();
+        //highscoreGO.text = score.ToString();
         gameOverText.SetActive(true);
         gameHUD.SetActive(false);
         gameOver = true;
 
-        
+        MenuManager.instance.TotalCoins += coins;  // current value
+        coins = 0;   // target value
+       
         if (score > MenuManager.instance.Highscore)
         {
             MenuManager.instance.SetHighscore(score.ToString());
-            highScore.SetActive(true);
         }
-
+        score = 0;
         manager.SaveDataButton();
 
     }
@@ -227,6 +278,8 @@ public class GameControl : MonoBehaviour
         //PlayerPrefs.SetInt("Coins", coins);
         //coinText.text = PlayerPrefs.GetInt("Coins", 0).ToString();
         coinText.text = coins.ToString();
+        score += 1;
+        highscoretext.text = score.ToString();
 
 
 
@@ -253,19 +306,24 @@ public class GameControl : MonoBehaviour
             turboSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 255);
         }
 
-
+        score += 10;
+        highscoretext.text = score.ToString();
     }
 
     public void GasolinaPickUp()
     {
         gasoline += MenuManager.instance.QuantityGas[MenuManager.instance.LevelGas];
         if (gasoline > 100) { gasoline = 100; }
+        score += 10;
+        highscoretext.text = score.ToString();
     }
 
     public void ImaPickUp()
     {
         isIma = true;
         timeIma = 0;
+        score += 10;
+        highscoretext.text = score.ToString();
     }
 
 }

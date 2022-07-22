@@ -78,9 +78,10 @@ public class FirebaseManager : MonoBehaviour
             FirebaseUser newUser = task.Result;
             Debug.LogFormat("User signed in successfully: {0} ({1})",
                 newUser.DisplayName, newUser.UserId);
+            MenuManager.instance.Username = "Guest";
+            MenuManager.instance.SkinNameSelected = "Default";
             FirebaseDatabase.DefaultInstance.GetReference("Player Status").Child(newUser.UserId).SetRawJsonValueAsync(JsonConvert.SerializeObject(new PlayerStatus().Initialize()));
-            MenuManager.instance.AccountCreations();
-            
+            FindObjectOfType<NewMenu>().ScreenUpdate();
         });
     }
     private void InitializeFirebase()
@@ -235,7 +236,7 @@ public class FirebaseManager : MonoBehaviour
                     break;
             }
             FindObjectOfType<Login>().Warning(message);
-            
+            FindObjectOfType<NewMenu>().ScreenUpdate();
         }
         else
         {
@@ -245,16 +246,18 @@ public class FirebaseManager : MonoBehaviour
             Debug.LogFormat("User signed in successfully: {0} ({1})", user.DisplayName, user.Email);
             FindObjectOfType<Login>().Warning("");
             FindObjectOfType<Login>().Confirmation("Logged In");
-
+            //StartCoroutine(Login(_email, _password));
+            GameObject.Find("New Menu").transform.GetChild(9).gameObject.SetActive(false);
+            MenuManager.instance.SetUserName(user.DisplayName);
             yield return new WaitForSeconds(3);
 
-            MenuManager.instance.Username = user.DisplayName;
+            //MenuManager.instance.Username = user.DisplayName;
 
 
-            FindObjectOfType<Login>().Confirmation("");
-            ClearLoginFeilds();
+            //FindObjectOfType<Login>().Confirmation("");
+            //ClearLoginFeilds();
             
-            StartCoroutine(LoadUserData(ScreenUp));
+            //StartCoroutine(LoadUserData(ScreenUp));
 
         }
     }
@@ -335,11 +338,24 @@ public class FirebaseManager : MonoBehaviour
                         //Username is now set
 
                         FindObjectOfType<Signup>().Warning("Registerd. Loggin in...");
-                        yield return new WaitForSeconds(3);
-                        ClearRegisterFeilds();
                         
-                        StartCoroutine(LoadUserData(ScreenUp));
-                        //FirebaseDatabase.DefaultInstance.GetReference("Player Status").Child(user.UserId).SetRawJsonValueAsync(JsonConvert.SerializeObject(new PlayerStatus().Initialize()));
+                        FirebaseDatabase.DefaultInstance.GetReference("Player Status").Child(user.UserId).SetRawJsonValueAsync(JsonConvert.SerializeObject(new PlayerStatus().Initialize()));
+                        
+                        Debug.Log("0");
+                        var task = auth.SignInWithEmailAndPasswordAsync(_email, _password);
+                        Debug.Log("1");
+                        yield return new WaitUntil(predicate: () => task.IsCompleted);
+                        Debug.Log("2");
+                        if (task.Exception == null)
+                        {
+                            Debug.Log("3");
+                            user = task.Result;
+                            MenuManager.instance.Username = user.DisplayName;
+                            FindObjectOfType<Signup>().Warning("");
+                            GameObject.Find("New Menu").transform.GetChild(8).gameObject.SetActive(false);
+                            StartCoroutine(UpdateUserName(_username));
+                            FindObjectOfType<NewMenu>().ScreenUpdate();
+                        }
                     }
                 }
 
@@ -353,7 +369,22 @@ public class FirebaseManager : MonoBehaviour
 
         }
     }
+    public IEnumerator UpdateUserName(string _username)
+    {
+        //Set the currently logged in user username in the database
+        var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("Username").SetValueAsync(_username);
 
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Database username is now updated
+        }
+    }
 
     public  IEnumerator UpdateSkinList(int _skinIndex)
     {
@@ -712,7 +743,7 @@ public class FirebaseManager : MonoBehaviour
 
     public bool IsAnonimo()
     {
-        if(MenuManager.instance.Username=="Guest")
+        if(MenuManager.instance.Username=="Guest" || MenuManager.instance.Username == "")
         {
             return true;         
         }

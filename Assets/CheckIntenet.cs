@@ -27,6 +27,7 @@ public class CheckIntenet : MonoBehaviour
 
     IEnumerator CheckInternetConnection()
     {
+        FindObjectOfType<NewMenu>().ScreenUpdate();
         Loading.gameObject.SetActive(true);
         loadinAnim.SetActive(true);
         tryAgain.gameObject.SetActive(false);
@@ -44,7 +45,8 @@ public class CheckIntenet : MonoBehaviour
         else
         {
             tela.SetActive(false);
-            InvokeRepeating(nameof(Check), 5.0f, 5.0f);
+            FindObjectOfType<NewMenu>().ScreenUpdate();
+            InvokeRepeating(nameof(Check), 1.0f, 5.0f);
         }
 
     }

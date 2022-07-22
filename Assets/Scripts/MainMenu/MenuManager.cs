@@ -152,6 +152,7 @@ public class MenuManager : MonoBehaviour
 
     public void UpdateSkinList(DataSnapshot snapshot)
     {
+        PlayerSkins.Clear();
         foreach (var child in snapshot.Children)
         {
             PlayerSkins.Add((int.Parse(child.Value.ToString())));

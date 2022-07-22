@@ -19,8 +19,8 @@ public class OptionsMenu : MonoBehaviour
     public void Start()
     {
         /// Starta Definindo se som e efeitos ficam ligados ou desligados
-        volumeGeral = PlayerPrefs.GetFloat("MusicVolume", 20f);
-        volumeSFX = PlayerPrefs.GetFloat("SFXVolume", 20f);
+        volumeGeral = PlayerPrefs.GetFloat("MusicVolume", 0f);
+        volumeSFX = PlayerPrefs.GetFloat("SFXVolume", 0f);
 
   
         sfxMixer.SetFloat("SFXVolume", volumeSFX);
