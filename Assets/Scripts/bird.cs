@@ -141,28 +141,28 @@ public class bird : MonoBehaviour
     public void OnCollisionEnter2D()
     {
 
-
         if (isDead == false)
         {
             if (!GameControl.instance.isDash)
             {
                 rb2d.gravityScale = 0;
                 rb2d.velocity = Vector2.zero;
-                FindObjectOfType<AudioManager>().Play("Morte");
+
                 anim.SetTrigger("isDead");
                 Helice.SetActive(false);
                 Wind.SetActive(false);
                 Aura.SetActive(false);
-                rb2d.velocity = Vector2.zero;
                 StartCoroutine(cameraShake.Shake(.2f, .2f));
+                FindObjectOfType<AudioManager>().Play("Morte");
                 FindObjectOfType<AudioManager>().Stop("Musica");
                 FindObjectOfType<AudioManager>().Stop("Helicoptero");
                 FindObjectOfType<AudioManager>().Stop("MagnetField");
                 FindObjectOfType<AudioManager>().Stop("Aura");
                 isDead = true;
-                
+    
                 GameControl.instance.BirdDied();
-                
+
+
             }   
             else
             {
@@ -176,7 +176,19 @@ public class bird : MonoBehaviour
 
     }
 
-
+    public void RepositionContinue()
+    {
+        Time.timeScale = 0f;
+        isDead = false;
+        Helice.SetActive(true);
+        anim.SetTrigger("Continue");
+        rb2d.gravityScale = 1;
+        rb2d.velocity = Vector2.zero;
+        GameControl.instance.gasoline += 50;
+        transform.position = new Vector3(-4.907f, 2.383f, 0f);
+        FindObjectOfType<AudioManager>().Play("Musica");
+        FindObjectOfType<AudioManager>().Play("Helicoptero");
+    }
 }
 
 

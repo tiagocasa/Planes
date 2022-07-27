@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "600617437529-0tbvtedrvck5p66onsjebs8svjle6ndp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.BigHouseStudio.EndlessEscape",
+            "certificate_hash": "cc8af07a6e50a879a733e721a0083d51081ae8e2"
+          }
+        },
+        {
+          "client_id": "600617437529-k9ktldl8mo94tockefu739dtgofitqk4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.BigHouseStudio.EndlessEscape",
+            "certificate_hash": "f3ee4f7cf138cb0e23d17e23a1175b45f4a91f9d"
+          }
+        },
+        {
           "client_id": "600617437529-6ib8juq5phncsabk0485b1rpl4oune3f.apps.googleusercontent.com",
           "client_type": 3
         }

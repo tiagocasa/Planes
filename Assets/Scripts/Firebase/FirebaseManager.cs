@@ -9,6 +9,11 @@ using Newtonsoft.Json;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Google;
+using System.Threading.Tasks;
+using Firebase.Extensions;
+using Facebook.Unity;
+using System.Collections.Generic;
 
 public class FirebaseManager : MonoBehaviour
 {
@@ -18,12 +23,23 @@ public class FirebaseManager : MonoBehaviour
     public FirebaseAuth auth;
     public FirebaseUser user;
     public DatabaseReference DBreference;
-
+    private string googleToken;
 
     static public bool once_call;
 
-  
+    public string GoogleWebAPI = "600617437529-6ib8juq5phncsabk0485b1rpl4oune3f.apps.googleusercontent.com";
 
+    private GoogleSignInConfiguration configuration;
+
+    private void Awake()
+    {
+        configuration = new GoogleSignInConfiguration
+        {
+            WebClientId = GoogleWebAPI,
+            RequestIdToken = true
+        };
+
+    }
     private void Start()
     {
         if (!once_call)
@@ -39,6 +55,8 @@ public class FirebaseManager : MonoBehaviour
 
         StartCoroutine(CheckAndFixDependencies());
     }
+
+ 
     private IEnumerator CheckAndFixDependencies()
     {
         var Check = FirebaseApp.CheckAndFixDependenciesAsync();
@@ -49,6 +67,7 @@ public class FirebaseManager : MonoBehaviour
         if (dependancyResult == DependencyStatus.Available)
         {
             InitializeFirebase();
+            FB.Init(InitCallBack, OnHideUnity);
             yield return new WaitForEndOfFrame();
             StartCoroutine(CheckAutoLogin());
         }
@@ -58,7 +77,18 @@ public class FirebaseManager : MonoBehaviour
         }
         
     }
+    private void InitCallBack()
+    {
+        if (!FB.IsInitialized)
+        {
+            FB.ActivateApp();
+        }
 
+    }
+    private void OnHideUnity(bool isgameshown)
+    {
+        if (isgameshown) FB.ActivateApp();
+    }
 
     private void StartAnonimous()
     {
@@ -202,7 +232,7 @@ public class FirebaseManager : MonoBehaviour
         }
     }
     //Function for the scoreboard button
-     private IEnumerator Login(string _email, string _password)
+    private IEnumerator Login(string _email, string _password)
     {
         //Call the Firebase auth signin function passing the email and password
         var LoginTask = auth.SignInWithEmailAndPasswordAsync(_email, _password);
@@ -404,6 +434,7 @@ public class FirebaseManager : MonoBehaviour
             //Coins is now updated
         }
     }
+  
 
     private IEnumerator UpdateUsernameAuth(string _username)
     {
@@ -473,7 +504,7 @@ public class FirebaseManager : MonoBehaviour
             //Database username is now updated
         }
     }
-    private IEnumerator UpdateCash(int _cash)
+    public IEnumerator UpdateCash(int _cash)
     {
         //Set the currently logged in user xp
         var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("Cash").SetValueAsync(_cash);
@@ -489,7 +520,7 @@ public class FirebaseManager : MonoBehaviour
             //Xp is now updated
         }
     }
-    private IEnumerator UpdateCoin(int _coins)
+    public IEnumerator UpdateCoin(int _coins)
     {
         //Set the currently logged in user xp
         var DBTask = DBreference.Child("Player Status").Child(user.UserId).Child("Coins").SetValueAsync(_coins);
@@ -611,6 +642,13 @@ public class FirebaseManager : MonoBehaviour
             MenuManager.instance.SetAvatarId(snapshot.Child("AvatarId").Value.ToString());
             MenuManager.instance.UpdateSkinList(snapshot.Child("PlayerSkins")) ;
 
+            if (!user.IsAnonymous)
+            {
+                if(MenuManager.instance.Username == "Guest" || MenuManager.instance.Username == "")
+                {
+                    GameObject.Find("New Menu").transform.GetChild(11).gameObject.SetActive(true);
+                }
+            }
             //FindObjectOfType<NewMenu>().ScreenUpdate();
 
             if (callback != null)
@@ -737,7 +775,7 @@ public class FirebaseManager : MonoBehaviour
             //UIManager.instance.ScoreboardScreen();
         }
 
-        FindObjectOfType<NewMenu>().transform.GetChild(12).gameObject.SetActive(false);
+        FindObjectOfType<NewMenu>().transform.GetChild(14).gameObject.SetActive(false);
     }
 
 
@@ -762,5 +800,126 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    
+    public void GoogleSignInClick()
+    {
+        GoogleSignIn.Configuration = configuration;
+        GoogleSignIn.Configuration.UseGameSignIn = false;
+        GoogleSignIn.Configuration.RequestIdToken = true;
+        GoogleSignIn.Configuration.RequestEmail = true;
+
+        GoogleSignIn.DefaultInstance.SignIn().ContinueWith(OnGoogleAuthFinished);
+       // var aToken = AccessToken.CurrentAccessToken;
+    }
+
+
+    void OnGoogleAuthFinished(Task<GoogleSignInUser> task)
+    {
+
+        if (task.IsFaulted)
+        {
+
+        }
+        else if (task.IsCanceled)
+        {
+
+        }
+        else
+        {
+            Firebase.Auth.Credential credential = Firebase.Auth.GoogleAuthProvider.GetCredential(task.Result.IdToken, null);
+            auth.CurrentUser.LinkWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
+            {
+                if (task.IsCanceled)
+                {
+                    Debug.Log("erro");
+                    return;
+                }
+                if (task.IsFaulted)
+                {
+                    StartCoroutine(GoogleLogin(credential));
+                    return;
+                }
+
+                GameObject.Find("New Menu").transform.GetChild(10).gameObject.SetActive(false);
+                GameObject.Find("New Menu").transform.GetChild(11).gameObject.SetActive(true);
+                return;
+
+            });
+        }
+    }
+
+    private IEnumerator GoogleLogin(Credential credential)
+    {
+        //Call the Firebase auth signin function passing the email and password
+        var LoginTask = auth.SignInWithCredentialAsync(credential);
+        //Wait until the task completes
+        yield return new WaitUntil(predicate: () => LoginTask.IsCompleted);
+
+        if (LoginTask.Exception != null)
+        {
+            //If there are errors handle them
+            Debug.LogWarning(message: $"Failed to register task with {LoginTask.Exception}");
+            FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
+            AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+        }
+        else
+        {
+            user = LoginTask.Result;
+            GameObject.Find("New Menu").transform.GetChild(10).gameObject.SetActive(false);
+            
+            yield return new WaitForSeconds(2);
+            FindObjectOfType<NewMenu>().ScreenUpdate();
+        }
+    }
+
+    public void Facebook_Login()
+    {
+        var permission = new List<string>() { "public_profile", "email" };
+        FB.LogInWithReadPermissions(permission, AuthCallBack);
+    }
+
+    private void AuthCallBack(ILoginResult result)
+    {
+        if (FB.IsLoggedIn)
+        {
+            var aToken = Facebook.Unity.AccessToken.CurrentAccessToken;
+ 
+            StartCoroutine(RegisterFace(aToken));
+
+        }
+        else
+        {
+           
+        }
+    }
+    private IEnumerator RegisterFace(AccessToken aToken)
+    {
+        
+        Credential credential = FacebookAuthProvider.GetCredential(aToken.ToString());
+        //Call the Firebase auth signin function passing the email and password
+        var LoginTask = auth.CurrentUser.LinkWithCredentialAsync(credential);
+        //Wait until the task completes
+        yield return new WaitUntil(predicate: () => LoginTask.IsCompleted);
+
+        if (LoginTask.Exception != null)
+        {
+            //If there are errors handle them
+            Debug.LogWarning(message: $"Failed to register task with {LoginTask.Exception}");
+            FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
+            AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+
+        }
+        else
+        {
+
+            user = LoginTask.Result;
+            Debug.LogFormat("User signed in successfully: {0} ({1})", user.DisplayName, user.Email);
+
+            GameObject.Find("New Menu").transform.GetChild(10).gameObject.SetActive(false);
+            GameObject.Find("New Menu").transform.GetChild(11).gameObject.SetActive(true);
+            yield return new WaitForSeconds(2);
+
+        }
+    }
+
+
 }

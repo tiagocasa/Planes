@@ -71,7 +71,9 @@ public class GameControl : MonoBehaviour
     public float turboFuel;
     public Slider turboSlider;
 
-    Coroutine _C2T;
+    public GameObject Continue;
+    private bool isContinue;
+    private bool alreadyContinue;
 
 
     public int TotalCoins { get => totalCoins; set => totalCoins = value; }
@@ -170,8 +172,6 @@ public class GameControl : MonoBehaviour
             isDash = false;
             timedash = 0;
             scrollSpeed= tempSpeed;
-            gasolineSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 255);
-            turboSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 100);
         }
 
         if (isIma && !gameOver && timeIma > TempoIma)
@@ -225,12 +225,41 @@ public class GameControl : MonoBehaviour
         }
 
     }
+    public void ContinueBtn()
+    {
+        alreadyContinue = true;
+        Continue.SetActive(false);
+        gameOver = false;
+        DisableObstacles();
+        FindObjectOfType<bird>().RepositionContinue();
+    }
+    private void DisableObstacles()
+    {
+        GameObject[] gameObjectArray = GameObject.FindGameObjectsWithTag("Coluna");
 
-
+        foreach (GameObject go in gameObjectArray)
+        {
+            go.SetActive(false);
+        }
+    }
     public void BirdDied()
     {
+        gameOver = true;
+        if (!alreadyContinue)
+        {
+            Continue.SetActive(true);
+        }
+        else
+        {
+            GameOverScreen();
+        }
+
+    }
+
+    public void GameOverScreen()
+    {
         //fazer efeito https://www.youtube.com/watch?v=CfX002SPWmU&ab_channel=Unity3DSchool
-     
+
         StartCoroutine(CountTo(coins, MenuManager.instance.TotalCoins));
         StartCoroutine(CountToHighscore(score));
 
@@ -246,14 +275,13 @@ public class GameControl : MonoBehaviour
 
         MenuManager.instance.TotalCoins += coins;  // current value
         coins = 0;   // target value
-       
+
         if (score > MenuManager.instance.Highscore)
         {
             MenuManager.instance.SetHighscore(score.ToString());
         }
         score = 0;
         manager.SaveDataButton();
-
     }
 
     public void BirdScored()
@@ -300,10 +328,9 @@ public class GameControl : MonoBehaviour
         }
         if (!isDash)
         {
+            FindObjectOfType<AudioManager>().Play("Aura");
             scrollSpeed *= 5;
             isDash = true;
-            gasolineSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 100);
-            turboSlider.transform.GetChild(0).GetChild(0).GetComponent<Image>().color = new Color32(255, 255, 255, 255);
         }
 
         score += 10;

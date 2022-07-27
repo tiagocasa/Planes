@@ -21,7 +21,7 @@ public class DashEffect : MonoBehaviour, IPooledObject
         {
             GameControl.instance.Dash();
             gameObject.transform.position = new Vector2(15, 25);
-            FindObjectOfType<AudioManager>().Play("Aura");
+            
         }
     }
 

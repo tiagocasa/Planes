@@ -158,7 +158,7 @@ public class AddCashCoin : MonoBehaviour
     private void BuyCash1Value()
     {
         MenuManager.instance.Cash += 100;
-        fm.SaveDataButton();
+        FindObjectOfType<FirebaseManager>().UpdateCash(MenuManager.instance.Cash);
         loading.SetActive(false);
     }
 
@@ -171,7 +171,7 @@ public class AddCashCoin : MonoBehaviour
     private void BuyCash2Value()
     {
         MenuManager.instance.Cash += 525;
-        fm.SaveDataButton();
+        FindObjectOfType<FirebaseManager>().UpdateCash(MenuManager.instance.Cash);
         loading.SetActive(false);
     }
 
@@ -184,7 +184,7 @@ public class AddCashCoin : MonoBehaviour
     private void BuyCash3Value()
     {
         MenuManager.instance.Cash += 1150;
-        fm.SaveDataButton();
+        FindObjectOfType<FirebaseManager>().UpdateCash(MenuManager.instance.Cash);
         loading.SetActive(false);
     }
 
@@ -196,8 +196,8 @@ public class AddCashCoin : MonoBehaviour
 
     private void BuyCash4Value()
     {
-        MenuManager.instance.Cash += 6000;
-        fm.SaveDataButton();
+        MenuManager.instance.Cash += 3750;
+        FindObjectOfType<FirebaseManager>().UpdateCash(MenuManager.instance.Cash);
         loading.SetActive(false);
     }
 
